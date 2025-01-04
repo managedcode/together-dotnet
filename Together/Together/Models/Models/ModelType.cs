@@ -1,13 +1,12 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Together.Models;
+namespace Together.Models.Models;
 
 /// <summary>
-/// Describes the model type.
+///     Describes the model type.
 /// </summary>
 [JsonConverter(typeof(ModelTypeConverter))]
 public readonly struct ModelType : IEquatable<ModelType>
@@ -40,23 +39,36 @@ public readonly struct ModelType : IEquatable<ModelType>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is ModelType other && Equals(other);
+    {
+        return obj is ModelType other && Equals(other);
+    }
 
     public bool Equals(ModelType other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class ModelTypeConverter : JsonConverter<ModelType>
     {
-        public override ModelType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override ModelType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new ModelType(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, ModelType value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, ModelType value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

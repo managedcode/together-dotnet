@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -7,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Together.Models.ChatCompletions;
 
 /// <summary>
-/// Describes the response format type.
+///     Describes the response format type.
 /// </summary>
 [JsonConverter(typeof(ResponseFormatTypeConverter))]
 public readonly struct ResponseFormatType : IEquatable<ResponseFormatType>
@@ -35,23 +34,36 @@ public readonly struct ResponseFormatType : IEquatable<ResponseFormatType>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is ResponseFormatType other && Equals(other);
+    {
+        return obj is ResponseFormatType other && Equals(other);
+    }
 
     public bool Equals(ResponseFormatType other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class ResponseFormatTypeConverter : JsonConverter<ResponseFormatType>
     {
-        public override ResponseFormatType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override ResponseFormatType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new ResponseFormatType(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, ResponseFormatType value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, ResponseFormatType value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

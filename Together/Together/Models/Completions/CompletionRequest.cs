@@ -1,10 +1,8 @@
-using Microsoft.Extensions.AI;
+namespace Together.Models.Completions;
 
-namespace Together.Models.ChatCompletions;
-
-public class ChatCompletionRequest
+public class CompletionRequest
 {
-    public List<ChatCompletionMessage> Messages { get; set; }
+    public string Prompt { get; set; }
     public string Model { get; set; }
     public int? MaxTokens { get; set; }
     public List<string> Stop { get; set; }
@@ -22,9 +20,6 @@ public class ChatCompletionRequest
     public bool? Echo { get; set; }
     public int? N { get; set; }
     public string SafetyModel { get; set; }
-    public ChatResponseFormat ResponseFormat { get; set; }
-    public List<Tools> Tools { get; set; }
-    public object ToolChoice { get; set; } // Use object to handle both ToolChoice and ToolChoiceEnum
 
     public void VerifyParameters()
     {

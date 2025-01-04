@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -7,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Together.Models.Finetune;
 
 /// <summary>
-/// Describes the download checkpoint type.
+///     Describes the download checkpoint type.
 /// </summary>
 [JsonConverter(typeof(DownloadCheckpointTypeConverter))]
 public readonly struct DownloadCheckpointType : IEquatable<DownloadCheckpointType>
@@ -36,23 +35,36 @@ public readonly struct DownloadCheckpointType : IEquatable<DownloadCheckpointTyp
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is DownloadCheckpointType other && Equals(other);
+    {
+        return obj is DownloadCheckpointType other && Equals(other);
+    }
 
     public bool Equals(DownloadCheckpointType other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class DownloadCheckpointTypeConverter : JsonConverter<DownloadCheckpointType>
     {
-        public override DownloadCheckpointType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override DownloadCheckpointType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new DownloadCheckpointType(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, DownloadCheckpointType value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, DownloadCheckpointType value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

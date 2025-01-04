@@ -1,14 +1,12 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Shared.Diagnostics;
 
 namespace Together.Models.Common;
 
 /// <summary>
-/// Describes the reason for finishing a process.
+///     Describes the reason for finishing a process.
 /// </summary>
 [JsonConverter(typeof(FinishReasonConverter))]
 public readonly struct FinishReason : IEquatable<FinishReason>
@@ -39,23 +37,36 @@ public readonly struct FinishReason : IEquatable<FinishReason>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is FinishReason other && Equals(other);
+    {
+        return obj is FinishReason other && Equals(other);
+    }
 
     public bool Equals(FinishReason other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class FinishReasonConverter : JsonConverter<FinishReason>
     {
-        public override FinishReason Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override FinishReason Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new FinishReason(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, FinishReason value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, FinishReason value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

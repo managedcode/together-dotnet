@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -7,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Together.Models.Finetune;
 
 /// <summary>
-/// Describes the fine-tune job event status levels.
+///     Describes the fine-tune job event status levels.
 /// </summary>
 [JsonConverter(typeof(FinetuneEventLevelsConverter))]
 public readonly struct FinetuneEventLevels : IEquatable<FinetuneEventLevels>
@@ -40,23 +39,36 @@ public readonly struct FinetuneEventLevels : IEquatable<FinetuneEventLevels>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is FinetuneEventLevels other && Equals(other);
+    {
+        return obj is FinetuneEventLevels other && Equals(other);
+    }
 
     public bool Equals(FinetuneEventLevels other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class FinetuneEventLevelsConverter : JsonConverter<FinetuneEventLevels>
     {
-        public override FinetuneEventLevels Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override FinetuneEventLevels Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new FinetuneEventLevels(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, FinetuneEventLevels value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, FinetuneEventLevels value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

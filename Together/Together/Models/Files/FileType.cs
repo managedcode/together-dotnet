@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -7,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Together.Models.Files;
 
 /// <summary>
-/// Describes the file type.
+///     Describes the file type.
 /// </summary>
 [JsonConverter(typeof(FileTypeConverter))]
 public readonly struct FileType : IEquatable<FileType>
@@ -35,23 +34,36 @@ public readonly struct FileType : IEquatable<FileType>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is FileType other && Equals(other);
+    {
+        return obj is FileType other && Equals(other);
+    }
 
     public bool Equals(FileType other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class FileTypeConverter : JsonConverter<FileType>
     {
-        public override FileType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override FileType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new FileType(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, FileType value, JsonSerializerOptions options) =>
+        public override void Write(Utf8JsonWriter writer, FileType value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
+        }
     }
 }

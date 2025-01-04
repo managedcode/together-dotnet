@@ -1,14 +1,12 @@
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Shared.Diagnostics;
 
 namespace Together.Models.Common;
 
 /// <summary>
-/// Describes the type of an object within the system.
+///     Describes the type of an object within the system.
 /// </summary>
 [JsonConverter(typeof(ObjectTypeConverter))]
 public readonly struct ObjectType : IEquatable<ObjectType>
@@ -42,24 +40,36 @@ public readonly struct ObjectType : IEquatable<ObjectType>
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
-        => obj is ObjectType other && Equals(other);
+    {
+        return obj is ObjectType other && Equals(other);
+    }
 
     public bool Equals(ObjectType other)
-        => string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    {
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
-        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    {
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class ObjectTypeConverter : JsonConverter<ObjectType>
     {
-        public override ObjectType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            new(reader.GetString()!);
+        public override ObjectType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new ObjectType(reader.GetString()!);
+        }
 
-        public override void Write(Utf8JsonWriter writer, ObjectType value, JsonSerializerOptions options) => 
+        public override void Write(Utf8JsonWriter writer, ObjectType value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue(value.Value);
-
+        }
     }
 }
