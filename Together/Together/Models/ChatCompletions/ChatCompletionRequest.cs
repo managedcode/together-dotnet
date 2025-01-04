@@ -1,31 +1,71 @@
-using System.Numerics;
-using Microsoft.Extensions.AI;
+using System.Text.Json.Serialization;
 
 namespace Together.Models.ChatCompletions;
 
 public class ChatCompletionRequest
 {
+    [JsonPropertyName("messages")]
     public List<ChatCompletionMessage> Messages { get; set; }
+
+    [JsonPropertyName("model")]
     public string Model { get; set; }
+
+    [JsonPropertyName("max_tokens")]
     public int? MaxTokens { get; set; }
+
+    [JsonPropertyName("stop")]
     public List<string> Stop { get; set; }
+
+    [JsonPropertyName("temperature")]
     public float? Temperature { get; set; }
+
+    [JsonPropertyName("top_p")]
     public float? TopP { get; set; }
+
+    [JsonPropertyName("top_k")]
     public int? TopK { get; set; }
+
+    [JsonPropertyName("repetition_penalty")]
     public float? RepetitionPenalty { get; set; }
+
+    [JsonPropertyName("presence_penalty")]
     public float? PresencePenalty { get; set; }
+
+    [JsonPropertyName("frequency_penalty")]
     public float? FrequencyPenalty { get; set; }
+
+    [JsonPropertyName("min_p")]
     public float? MinP { get; set; }
+
+    [JsonPropertyName("logit_bias")]
     public Dictionary<string, float> LogitBias { get; set; }
-    public ulong? Seed   { get; set; }
+
+    [JsonPropertyName("seed")]
+    public ulong? Seed { get; set; }
+
+    [JsonPropertyName("stream")]
     public bool Stream { get; set; } = false;
+
+    [JsonPropertyName("logprobs")]
     public int? Logprobs { get; set; }
+
+    [JsonPropertyName("echo")]
     public bool? Echo { get; set; }
+
+    [JsonPropertyName("n")]
     public int? N { get; set; }
+
+    [JsonPropertyName("safety_model")]
     public string SafetyModel { get; set; }
-    public ChatResponseFormat ResponseFormat { get; set; }
+
+    [JsonPropertyName("response_format")]
+    public ResponseFormat ResponseFormat { get; set; }
+
+    [JsonPropertyName("tools")]
     public List<Tools> Tools { get; set; }
-    public object ToolChoice { get; set; } // Use object to handle both ToolChoice and ToolChoiceEnum
+
+    [JsonPropertyName("tool_choice")]
+    public object ToolChoice { get; set; }
 
     public void VerifyParameters()
     {
