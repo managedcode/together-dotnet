@@ -25,7 +25,7 @@ public class HttpCallsTests
     [Fact]
     public async Task CompletionTest()
     {
-        var client = new TogetherChatCompletionsClient(CreateHttpClient());
+        var client = new TogetherClient(CreateHttpClient());
         
 
         var responseAsync = await client.GetCompletionResponseAsync(new CompletionRequest()
@@ -41,7 +41,7 @@ public class HttpCallsTests
     [Fact]
     public async Task ChatCompletionTest()
     {
-        var client = new TogetherChatCompletionsClient(CreateHttpClient());
+        var client = new TogetherClient(CreateHttpClient());
 
         var responseAsync = await client.GetChatCompletionResponseAsync(new ChatCompletionRequest
         {
@@ -61,9 +61,34 @@ public class HttpCallsTests
     }
     
     [Fact]
+    public async Task StreamChatCompletionTest()
+    {
+        var client = new TogetherClient(CreateHttpClient());
+
+        var responseAsync = await client.GetStreamChatCompletionResponseAsync(new ChatCompletionRequest
+        {
+            Messages = new List<ChatCompletionMessage>()
+            {
+                new ChatCompletionMessage()
+                {
+                    Role = ChatRole.User,
+                    Content = "Hi"
+                }
+            },
+            Model = "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            MaxTokens = 20,
+            Stream = true
+        }).Select(s=> string.Join("",s.Choices.Select(c=>c.Delta.Content))).ToListAsync();
+        
+        
+        
+        Assert.NotNull(responseAsync);
+    }
+    
+    [Fact]
     public async Task EmbeddingTest()
     {
-        var client = new TogetherChatCompletionsClient(CreateHttpClient());
+        var client = new TogetherClient(CreateHttpClient());
 
         var responseAsync = await client.GetEmbeddingResponseAsync(new EmbeddingRequest()
         {
@@ -77,16 +102,16 @@ public class HttpCallsTests
     [Fact]
     public async Task ImageTest()
     {
-        var client = new TogetherChatCompletionsClient(CreateHttpClient());
+        var client = new TogetherClient(CreateHttpClient());
 
         var responseAsync = await client.GetImageResponseAsync(new ImageRequest()
         {
-            Model = "black-forest-labs/FLUX.1.1-pro",
-            Prompt = "korenian girl playng the violin",
-            N = 4,
-            Steps = 20,
-            Height = 128,
-            Width = 128
+            Model = "black-forest-labs/FLUX.1-dev",
+            Prompt = "Cats eating popcorn",
+            N = 1,
+            Steps = 10,
+            Height = 512,
+            Width = 512
         });
         
         Assert.NotNull(responseAsync.Data);

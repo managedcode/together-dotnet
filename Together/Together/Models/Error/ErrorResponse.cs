@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Together.Models.Error;
 
-public class TogetherErrorResponse
+public class Error
 {
     [JsonPropertyName("message")]
     public string Message { get; set; }
@@ -15,4 +15,14 @@ public class TogetherErrorResponse
 
     [JsonPropertyName("code")]
     public string Code { get; set; }
+}
+
+
+public class ErrorResponse
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+    
+    [JsonPropertyName("error")]
+    public Error Error { get; set; }
 }
