@@ -1,16 +1,18 @@
+using System.Text.Json.Serialization;
+
 namespace Together.Models.Error;
 
 public class TogetherErrorResponse
 {
-    // Error message
+    [JsonPropertyName("message")]
     public string Message { get; set; }
 
-    // Error type
+    [JsonPropertyName("type")]
     public string Type { get; set; }
 
-    // Param causing error
+    [JsonPropertyName("param")]
     public string Param { get; set; }
 
-    // Error code
+    [JsonPropertyName("code")]
     public string Code { get; set; }
 }
