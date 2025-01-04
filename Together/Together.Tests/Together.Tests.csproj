@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Together.SemanticKernel\Together.SemanticKernel.csproj" />
         <ProjectReference Include="..\Together\Together.csproj"/>
     </ItemGroup>
 

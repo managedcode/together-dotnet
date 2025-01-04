@@ -1,8 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.AI;
 using Together.Models.ChatCompletions;
 using Together.Models.Completions;
 using Together.Models.Embeddings;
@@ -11,67 +9,57 @@ using Together.Models.Images;
 
 namespace Together;
 
-public class TogetherClient(HttpClient httpClient) : IChatClient
+public class TogetherClient(HttpClient httpClient)
 {
-    public void Dispose()
+    private async Task<TResponse> SendRequestAsync<TRequest, TResponse>(string requestUri, TRequest request, CancellationToken cancellationToken)
     {
-        httpClient.Dispose();
+        var responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            var result = await responseMessage.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
+            return result!;
+        }
+
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        if (errorResponse?.Error != null)
+        {
+            throw new Exception(errorResponse.Error.Message);
+        }
+
+        var statusCode = responseMessage.StatusCode;
+        var errorContent = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+        throw new Exception($"Request failed with status code {statusCode}: {errorContent}");
     }
 
-    async Task<ChatCompletion> IChatClient.CompleteAsync(IList<ChatMessage> chatMessages, ChatOptions? options = null,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    async IAsyncEnumerable<StreamingChatCompletionUpdate> IChatClient.CompleteStreamingAsync(IList<ChatMessage> chatMessages, ChatOptions? options = null,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        yield return new StreamingChatCompletionUpdate();
-        throw new NotImplementedException();
-    }
-
-    object? IChatClient.GetService(Type serviceType, object? serviceKey = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    ChatClientMetadata IChatClient.Metadata { get; }
-    
-      private JsonSerializerOptions GetJsonSerializerOptions => new(JsonSerializerDefaults.Web)
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
-    };
-    
     public async Task<CompletionResponse> GetCompletionResponseAsync(CompletionRequest request, CancellationToken cancellationToken = default)
     {
-        var responseMessage = await httpClient.PostAsJsonAsync(requestUri: "/completions", value: request, options: GetJsonSerializerOptions, cancellationToken);
-        
-        var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-        responseMessage.EnsureSuccessStatusCode();
-        
-        
-        return await responseMessage.Content.ReadFromJsonAsync<CompletionResponse>(cancellationToken: cancellationToken);
+        return await SendRequestAsync<CompletionRequest, CompletionResponse>("/completions", request, cancellationToken);
     }
-    
+
     public async Task<ChatCompletionResponse> GetChatCompletionResponseAsync(ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {
-        
-        var responseMessage = await httpClient.PostAsJsonAsync(requestUri: "/chat/completions", value: request,  options: GetJsonSerializerOptions, cancellationToken);
-      
-        var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-        responseMessage.EnsureSuccessStatusCode();
-        
-        return await responseMessage.Content.ReadFromJsonAsync<ChatCompletionResponse>(cancellationToken: cancellationToken);
+        return await SendRequestAsync<ChatCompletionRequest, ChatCompletionResponse>("/chat/completions", request, cancellationToken);
     }
     
     public async IAsyncEnumerable<ChatCompletionChunk> GetStreamChatCompletionResponseAsync(ChatCompletionRequest request, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var responseMessage = await httpClient.PostAsJsonAsync(requestUri: "/chat/completions", value: request,  options: GetJsonSerializerOptions, cancellationToken);
-        responseMessage.EnsureSuccessStatusCode();
+        var responseMessage = await httpClient.PostAsJsonAsync("/chat/completions", request, cancellationToken);
+
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+            if (errorResponse?.Error != null)
+            {
+                throw new Exception(errorResponse.Error.Message);
+            }
+
+            var statusCode = responseMessage.StatusCode;
+            var errorContent = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+            throw new Exception($"Request failed with status code {statusCode}: {errorContent}");
+        }
 
         await using var stream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
-
         using var reader = new StreamReader(stream);
 
         while (await reader.ReadLineAsync(cancellationToken) is string line)
@@ -89,28 +77,14 @@ public class TogetherClient(HttpClient httpClient) : IChatClient
                 yield return result;
         }
     }
-    
+
     public async Task<EmbeddingResponse> GetEmbeddingResponseAsync(EmbeddingRequest request, CancellationToken cancellationToken = default)
     {
-        var responseMessage = await httpClient.PostAsJsonAsync(requestUri: "/embeddings", value: request,  options: GetJsonSerializerOptions, cancellationToken);
-      
-        var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-        responseMessage.EnsureSuccessStatusCode();
-        
-        return await responseMessage.Content.ReadFromJsonAsync<EmbeddingResponse>(cancellationToken: cancellationToken);
+        return await SendRequestAsync<EmbeddingRequest, EmbeddingResponse>("/embeddings", request, cancellationToken);
     }
-    
+
     public async Task<ImageResponse> GetImageResponseAsync(ImageRequest request, CancellationToken cancellationToken = default)
     {
-        var responseMessage = await httpClient.PostAsJsonAsync(requestUri: "/images/generations", value: request,  options: GetJsonSerializerOptions, cancellationToken);
-      
-        var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-        
-        if(responseMessage.IsSuccessStatusCode)
-            return await responseMessage.Content.ReadFromJsonAsync<ImageResponse>(cancellationToken: cancellationToken);
- 
-        
-        var responce = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
-        throw new Exception(responce.Error.Message);
+        return await SendRequestAsync<ImageRequest, ImageResponse>("/images/generations", request, cancellationToken);
     }
 }

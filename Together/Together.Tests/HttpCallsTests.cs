@@ -31,11 +31,11 @@ public class HttpCallsTests
         var responseAsync = await client.GetCompletionResponseAsync(new CompletionRequest()
         {
             Prompt = "Hi",
-            Model = "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             MaxTokens = 20
         });
         
-        Assert.NotNull(responseAsync.Usage);
+        Assert.NotEmpty(responseAsync.Choices.First().Text);
     }
     
     [Fact]
@@ -53,11 +53,11 @@ public class HttpCallsTests
                     Content = "Hi"
                 }
             },
-            Model = "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             MaxTokens = 20
         });
         
-        Assert.NotNull(responseAsync.Usage);
+        Assert.NotEmpty(responseAsync.Choices.First().Message.Content);
     }
     
     [Fact]
@@ -75,14 +75,14 @@ public class HttpCallsTests
                     Content = "Hi"
                 }
             },
-            Model = "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             MaxTokens = 20,
             Stream = true
         }).Select(s=> string.Join("",s.Choices.Select(c=>c.Delta.Content))).ToListAsync();
         
         
         
-        Assert.NotNull(responseAsync);
+        Assert.NotEmpty(responseAsync);
     }
     
     [Fact]
@@ -114,6 +114,25 @@ public class HttpCallsTests
             Width = 512
         });
         
-        Assert.NotNull(responseAsync.Data);
+        Assert.NotEmpty(responseAsync.Data.First().Url);
+    }
+    
+    [Fact]
+    public async Task WrongModelTest()
+    {
+        var client = new TogetherClient(CreateHttpClient());
+
+        await Assert.ThrowsAsync<Exception>(async () =>
+        {
+            var responseAsync = await client.GetImageResponseAsync(new ImageRequest()
+            {
+                Model = "Wring-Model",
+                Prompt = "so wrong",
+                N = 1,
+                Steps = 10,
+                Height = 512,
+                Width = 512
+            });
+        });
     }
 }

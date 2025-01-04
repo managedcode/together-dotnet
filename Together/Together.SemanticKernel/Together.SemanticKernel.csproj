@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Together\Together.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.32.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core\" />
+      <Folder Include="Extensions\" />
+      <Folder Include="Settings\" />
+    </ItemGroup>
+
+</Project>
