@@ -1,3 +1,4 @@
+using System.Numerics;
 using Microsoft.Extensions.AI;
 
 namespace Together.Models.ChatCompletions;
@@ -16,7 +17,7 @@ public class ChatCompletionRequest
     public float? FrequencyPenalty { get; set; }
     public float? MinP { get; set; }
     public Dictionary<string, float> LogitBias { get; set; }
-    public int? Seed { get; set; }
+    public ulong? Seed   { get; set; }
     public bool Stream { get; set; } = false;
     public int? Logprobs { get; set; }
     public bool? Echo { get; set; }

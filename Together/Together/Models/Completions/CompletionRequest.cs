@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Together.Models.Completions;
 
 public class CompletionRequest
@@ -14,7 +16,7 @@ public class CompletionRequest
     public float? FrequencyPenalty { get; set; }
     public float? MinP { get; set; }
     public Dictionary<string, float> LogitBias { get; set; }
-    public int? Seed { get; set; }
+    public ulong? Seed   { get; set; }
     public bool Stream { get; set; } = false;
     public int? Logprobs { get; set; }
     public bool? Echo { get; set; }

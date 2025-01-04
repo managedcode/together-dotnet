@@ -21,7 +21,7 @@ public static class ChatOptionsConverter
             TopK = options.TopK,
             PresencePenalty = options.PresencePenalty,
             FrequencyPenalty = options.FrequencyPenalty,
-            Seed = (int?)options.Seed,
+            //Seed = options.Seed,
             ResponseFormat = options.ResponseFormat,
             //Tools = options.Tools.Select(t => t.ToString()).ToList(),
             Stream = false
