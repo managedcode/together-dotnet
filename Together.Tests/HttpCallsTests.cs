@@ -11,7 +11,7 @@ namespace Together.Tests;
 
 public class HttpCallsTests
 {
-    static string API_KEY= "PUT YOUR KEY HERE";
+    static string API_KEY= "API_KEY";
     
     private HttpClient CreateHttpClient()
     {
