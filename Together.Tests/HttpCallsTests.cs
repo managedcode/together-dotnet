@@ -5,6 +5,7 @@ using Together.Models.ChatCompletions;
 using Together.Models.Completions;
 using Together.Models.Embeddings;
 using Together.Models.Images;
+using Together.Models.Rerank;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace Together.Tests;
@@ -19,6 +20,7 @@ public class HttpCallsTests
         httpClient.Timeout = TimeSpan.FromSeconds(TogetherConstants.TIMEOUT_SECS);
         httpClient.BaseAddress = new Uri(TogetherConstants.BASE_URL);
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", API_KEY);
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return httpClient;
     }
     
@@ -28,7 +30,7 @@ public class HttpCallsTests
         var client = new TogetherClient(CreateHttpClient());
         
 
-        var responseAsync = await client.GetCompletionResponseAsync(new CompletionRequest()
+        var responseAsync = await client.Completions.CreateAsync(new CompletionRequest()
         {
             Prompt = "Hi",
             Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
@@ -43,7 +45,7 @@ public class HttpCallsTests
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.GetChatCompletionResponseAsync(new ChatCompletionRequest
+        var responseAsync = await client.ChatCompletions.CreateAsync(new ChatCompletionRequest
         {
             Messages = new List<ChatCompletionMessage>()
             {
@@ -65,7 +67,7 @@ public class HttpCallsTests
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.GetStreamChatCompletionResponseAsync(new ChatCompletionRequest
+        var responseAsync = await client.ChatCompletions.CreateStreamAsync(new ChatCompletionRequest
         {
             Messages = new List<ChatCompletionMessage>()
             {
@@ -90,7 +92,7 @@ public class HttpCallsTests
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.GetEmbeddingResponseAsync(new EmbeddingRequest()
+        var responseAsync = await client.Embeddings.CreateAsync(new EmbeddingRequest()
         {
             Input = "Hi",
             Model = "togethercomputer/m2-bert-80M-2k-retrieval",
@@ -104,7 +106,7 @@ public class HttpCallsTests
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.GetImageResponseAsync(new ImageRequest()
+        var responseAsync = await client.Images.GenerateAsync(new ImageRequest()
         {
             Model = "black-forest-labs/FLUX.1-dev",
             Prompt = "Cats eating popcorn",
@@ -118,13 +120,36 @@ public class HttpCallsTests
     }
     
     [Fact]
+    public async Task ModelsTest()
+    {
+        var client = new TogetherClient(CreateHttpClient());
+
+        var responseAsync = await client.Models.ListModelsAsync();
+        
+        Assert.NotEmpty(responseAsync);
+    }
+    
+    [Fact]
+    public async Task RerankTest()
+    {
+        var client = new TogetherClient(CreateHttpClient());
+
+        var responseAsync = await client.Rerank.CreateAsync(new RerankRequest()
+        {
+            
+        });
+        
+        Assert.NotEmpty(responseAsync.Results);
+    }
+    
+    [Fact]
     public async Task WrongModelTest()
     {
         var client = new TogetherClient(CreateHttpClient());
 
         await Assert.ThrowsAsync<Exception>(async () =>
         {
-            var responseAsync = await client.GetImageResponseAsync(new ImageRequest()
+            var responseAsync = await client.Images.GenerateAsync(new ImageRequest()
             {
                 Model = "Wring-Model",
                 Prompt = "so wrong",

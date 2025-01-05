@@ -3,12 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Together.Models.Files;
-
-/// <summary>
-///     Describes the file purpose.
-/// </summary>
-[JsonConverter(typeof(FilePurposeConverter))]
 public readonly struct FilePurpose : IEquatable<FilePurpose>
 {
     public static FilePurpose FineTune { get; } = new("fine-tune");
@@ -20,6 +14,11 @@ public readonly struct FilePurpose : IEquatable<FilePurpose>
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
         Value = value;
+    }
+
+    public static FilePurpose FromString(string value)
+    {
+        return new FilePurpose(value);
     }
 
     public static bool operator ==(FilePurpose left, FilePurpose right)
