@@ -1,21 +1,5 @@
 # Together .NET SDK
-
 C# SDK for Together.ai
-
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Initialization](#initialization)
-  - [Completions](#completions)
-  - [Chat Completions](#chat-completions)
-  - [Embeddings](#embeddings)
-  - [Images](#images)
-- [Constants](#constants)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -56,7 +40,11 @@ var client = new TogetherClient(httpClient);
 To get a text completion:
 
 ```csharp
-var request = new CompletionRequest { Prompt = "Hello, world!" };
+var request = new CompletionRequest
+{
+    Prompt = "Hello, world!",
+    Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
+};
 var response = await client.GetCompletionResponseAsync(request);
 Console.WriteLine(response.Choices.First().Text);
 ```
@@ -68,7 +56,8 @@ To get a chat completion:
 ```csharp
 var request = new ChatCompletionRequest
 {
-    Messages = new List<ChatCompletionMessage> { new ChatCompletionMessage { Role = "user", Content = "Hello!" } }
+    Messages = new List<ChatCompletionMessage> { new ChatCompletionMessage { Role = "user", Content = "Hello!" } },
+    Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
 };
 var response = await client.GetChatCompletionResponseAsync(request);
 Console.WriteLine(response.Choices.First().Message.Content);
@@ -79,7 +68,11 @@ Console.WriteLine(response.Choices.First().Message.Content);
 To get embeddings:
 
 ```csharp
-var request = new EmbeddingRequest { Input = "Hello, world!" };
+var request = new EmbeddingRequest
+{
+    Input = "Hello, world!",
+    Model = "togethercomputer/m2-bert-80M-2k-retrieval"
+};
 var response = await client.GetEmbeddingResponseAsync(request);
 Console.WriteLine(string.Join(", ", response.Data.First().Embedding));
 ```
