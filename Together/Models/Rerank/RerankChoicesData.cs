@@ -12,5 +12,5 @@ public class RerankChoicesData
     public float RelevanceScore { get; set; }
 
     [JsonPropertyName("document")]
-    public Dictionary<string, JsonObject> Document { get; set; } = new();
+    public List<string> Document { get; set; } = new();
 }

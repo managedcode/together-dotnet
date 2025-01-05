@@ -10,7 +10,7 @@ using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace Together.Tests;
 
-public class HttpCallsTests
+public class IntegraionTests
 {
     static string API_KEY= "API_KEY";
     

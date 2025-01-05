@@ -12,7 +12,7 @@ public class RerankRequest
     public string Query { get; set; }
 
     [JsonPropertyName("documents")]
-    public List<JsonObject> Documents { get; set; }
+    public List<string> Documents { get; set; }
 
     [JsonPropertyName("top_n")]
     public int? TopN { get; set; }
