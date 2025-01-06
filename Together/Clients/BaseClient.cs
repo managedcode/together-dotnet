@@ -15,7 +15,21 @@ public abstract class BaseClient
     protected async Task<TResponse> SendRequestAsync<TRequest, TResponse>(string requestUri, TRequest request, CancellationToken cancellationToken)
     {
         var responseMessage = await HttpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
-        return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
+        }
+
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        if (errorResponse?.Error != null)
+        {
+            throw new Exception(errorResponse.Error.Message);
+        }
+
+        var statusCode = responseMessage.StatusCode;
+        var errorContent = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+        throw new Exception($"Request failed with status code {statusCode}: {errorContent}");
     }
 
     protected async Task<TResponse> SendRequestAsync<TResponse>(string requestUri, HttpMethod method, HttpContent? content, CancellationToken cancellationToken)
@@ -27,7 +41,21 @@ public abstract class BaseClient
         }
 
         var responseMessage = await HttpClient.SendAsync(request, cancellationToken);
-        return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
+        }
+
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        if (errorResponse?.Error != null)
+        {
+            throw new Exception(errorResponse.Error.Message);
+        }
+
+        var statusCode = responseMessage.StatusCode;
+        var errorContent = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+        throw new Exception($"Request failed with status code {statusCode}: {errorContent}");
     }
 
     private static async Task<TResponse> HandleResponseAsync<TResponse>(HttpResponseMessage responseMessage, CancellationToken cancellationToken)

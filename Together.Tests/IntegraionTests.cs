@@ -24,7 +24,11 @@ public class IntegraionTests
         return httpClient;
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+        (Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task CompletionTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -40,7 +44,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync.Choices.First().Text);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task ChatCompletionTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -62,7 +70,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync.Choices.First().Message.Content);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task StreamChatCompletionTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -87,7 +99,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task EmbeddingTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -101,7 +117,11 @@ public class IntegraionTests
         Assert.NotNull(responseAsync.Data);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task ImageTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -119,7 +139,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync.Data.First().Url);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task ModelsTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -129,7 +153,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task RerankTest()
     {
         var client = new TogetherClient(CreateHttpClient());
@@ -142,7 +170,11 @@ public class IntegraionTests
         Assert.NotEmpty(responseAsync.Results);
     }
     
-    [Fact]
+    [Fact
+#if !API_TEST
+(Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
     public async Task WrongModelTest()
     {
         var client = new TogetherClient(CreateHttpClient());

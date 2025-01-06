@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+[JsonConverter(typeof(FilePurposeConverter))]
 public readonly struct FilePurpose : IEquatable<FilePurpose>
 {
     public static FilePurpose FineTune { get; } = new("fine-tune");

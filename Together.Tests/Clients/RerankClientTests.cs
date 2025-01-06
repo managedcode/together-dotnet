@@ -19,7 +19,7 @@ public class RerankClientTests : TestBase
                 ""results"": [{
                     ""index"": 0,
                     ""relevance_score"": 0.95,
-                    ""document"": ""Test document""
+                    ""document"": [""Test document""]
                 }]
             }")
         };
@@ -38,7 +38,7 @@ public class RerankClientTests : TestBase
         // Assert
         Assert.NotNull(result);
         Assert.Single(result.Results);
-        Assert.Equal(0.95, result.Results[0].RelevanceScore);
+        Assert.Equal(0.95, result.Results[0].RelevanceScore, precision: 7);
         Assert.Equal("Test document", result.Results[0].Document.First());
     }
 }
