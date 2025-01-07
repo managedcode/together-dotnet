@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+namespace Together.Models.Files;
+
 [JsonConverter(typeof(FilePurposeConverter))]
 public readonly struct FilePurpose : IEquatable<FilePurpose>
 {

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Together.Models.ChatCompletions;
 
-public class Tools
+public class Tool
 {
     [JsonPropertyName("type")]
     public string Type { get; set; }

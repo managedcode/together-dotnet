@@ -62,7 +62,7 @@ public class ChatCompletionRequest
     public ResponseFormat ResponseFormat { get; set; }
 
     [JsonPropertyName("tools")]
-    public List<Tools> Tools { get; set; }
+    public List<Tool> Tools { get; set; }
 
     [JsonPropertyName("tool_choice")]
     public object ToolChoice { get; set; }
