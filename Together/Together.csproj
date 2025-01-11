@@ -17,5 +17,5 @@
         <Description>Together.AI .NET SDK</Description>
         <PackageTags>managedcode, sdk, dotnet, together, togetherai, together-dotnet</PackageTags>
     </PropertyGroup>
-    
+
 </Project>

@@ -1,9 +1,12 @@
 # Together .NET SDK
+
 C# SDK for Together.ai
 
 ## Introduction
 
-The Together .NET SDK provides a simple and efficient way to interact with the Together.ai API using C#. This SDK allows you to easily integrate various AI capabilities such as completions, chat completions, embeddings, and image generations into your .NET applications.
+The Together .NET SDK provides a simple and efficient way to interact with the Together.ai API using C#. This SDK allows
+you to easily integrate various AI capabilities such as completions, chat completions, embeddings, and image generations
+into your .NET applications.
 
 ## Features
 
@@ -97,7 +100,8 @@ Console.WriteLine(response.Data.First().Url);
 
 ## Constants
 
-The SDK provides various constants that can be used throughout your application. These constants are defined in the `TogetherConstants` class.
+The SDK provides various constants that can be used throughout your application. These constants are defined in the
+`TogetherConstants` class.
 
 ## Contributing
 

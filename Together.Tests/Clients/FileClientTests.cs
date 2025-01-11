@@ -1,9 +1,7 @@
 using System.Net;
-using System.Text;
 using Moq;
 using Moq.Protected;
 using Together.Clients;
-using Together.Models.Files;
 
 namespace Together.Tests.Clients;
 
@@ -174,11 +172,11 @@ public class FileClientTests : TestBase
     {
         // Arrange
         var client = new FileClient(new HttpClient());
-        var nonExistentFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var nonExistentFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid()
+            .ToString());
 
         // Act & Assert
-        await Assert.ThrowsAsync<FileNotFoundException>(() => 
-            client.UploadAsync(nonExistentFile));
+        await Assert.ThrowsAsync<FileNotFoundException>(() => client.UploadAsync(nonExistentFile));
     }
 
     [Fact]
@@ -186,8 +184,7 @@ public class FileClientTests : TestBase
     {
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
-        mockHandler
-            .Protected()
+        mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Network error"));
 
@@ -197,8 +194,7 @@ public class FileClientTests : TestBase
         try
         {
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
-                client.UploadAsync(tempFile));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => client.UploadAsync(tempFile));
         }
         finally
         {

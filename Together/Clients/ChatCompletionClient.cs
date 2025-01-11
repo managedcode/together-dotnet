@@ -6,8 +6,7 @@ namespace Together.Clients;
 
 public class ChatCompletionClient(HttpClient httpClient) : BaseClient(httpClient)
 {
-    public async Task<ChatCompletionResponse> CreateAsync(ChatCompletionRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<ChatCompletionResponse> CreateAsync(ChatCompletionRequest request, CancellationToken cancellationToken = default)
     {
         return await SendRequestAsync<ChatCompletionRequest, ChatCompletionResponse>("/chat/completions", request, cancellationToken);
     }
@@ -23,18 +22,23 @@ public class ChatCompletionClient(HttpClient httpClient) : BaseClient(httpClient
         while (await reader.ReadLineAsync(cancellationToken) is string line)
         {
             if (!line.StartsWith("data:"))
+            {
                 continue;
+            }
 
             var eventData = line.Substring("data:".Length)
                 .Trim();
             if (eventData is null or "[DONE]")
+            {
                 break;
+            }
 
             var result = JsonSerializer.Deserialize<ChatCompletionChunk>(eventData);
 
             if (result is not null)
+            {
                 yield return result;
+            }
         }
     }
-
 }

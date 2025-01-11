@@ -1,17 +1,9 @@
 using System.Net;
-using Moq;
-using Moq.Protected;
-using Together.Clients;
-using Together.Models.Error;
 
 namespace Together.Tests.Clients;
 
 public class BaseClientTests : TestBase
 {
-
-    private record TestRequest(string Data);
-    private record TestResponse(string Result);
-
     [Fact]
     public async Task SendRequestAsync_ThrowsException_WhenErrorResponse()
     {
@@ -24,7 +16,7 @@ public class BaseClientTests : TestBase
         var client = new TestClient(CreateMockHttpClient(response));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => 
+        var exception = await Assert.ThrowsAsync<Exception>(() =>
             client.TestSendRequest<TestRequest, TestResponse>("/test", new TestRequest("test")));
         Assert.Equal("Test error", exception.Message);
     }
@@ -46,4 +38,8 @@ public class BaseClientTests : TestBase
         // Assert
         Assert.Equal("success", result.Result);
     }
+
+    private record TestRequest(string Data);
+
+    private record TestResponse(string Result);
 }

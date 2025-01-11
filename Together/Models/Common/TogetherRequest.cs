@@ -1,6 +1,4 @@
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.AI;
-using System.Collections.Generic;
 
 namespace Together.Models.Common;
 

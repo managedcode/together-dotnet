@@ -1,7 +1,4 @@
-
 using System.Net;
-using Moq;
-using Moq.Protected;
 using Together.Clients;
 using Together.Models.Embeddings;
 
@@ -45,6 +42,7 @@ public class EmbeddingClientTests : TestBase
         Assert.NotNull(result);
         Assert.Single(result.Data);
         Assert.Equal(3, result.Data[0].Embedding.Count);
-        Assert.Equal(0.1f, result.Data[0].Embedding[0]);
+        Assert.Equal(0.1f, result.Data[0]
+            .Embedding[0]);
     }
 }

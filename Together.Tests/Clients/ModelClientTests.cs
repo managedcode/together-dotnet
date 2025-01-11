@@ -1,8 +1,5 @@
 using System.Net;
-using Moq;
-using Moq.Protected;
 using Together.Clients;
-using Together.Models.Models;
 
 namespace Together.Tests.Clients;
 

@@ -1,6 +1,4 @@
 using System.Net;
-using Moq;
-using Moq.Protected;
 using Together.Clients;
 using Together.Models.Completions;
 

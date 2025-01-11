@@ -1,5 +1,3 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Together.Models.Finetune;
 
 namespace Together.Clients;
@@ -36,19 +34,15 @@ public class FineTuneClient(HttpClient httpClient) : BaseClient(httpClient)
         return await SendRequestAsync<FinetuneTrainingLimits>($"/fine-tunes/models/limits?model={model}", HttpMethod.Get, null, cancellationToken);
     }
 
-    public virtual async Task<FinetuneDownloadResult> DownloadAsync(
-        string id, 
-        string? outputPath = null,
-        int checkpointStep = -1,
-        DownloadCheckpointType? checkpointType = null,
-        CancellationToken cancellationToken = default)
+    public virtual async Task<FinetuneDownloadResult> DownloadAsync(string id, string? outputPath = null, int checkpointStep = -1,
+        DownloadCheckpointType? checkpointType = null, CancellationToken cancellationToken = default)
     {
         var url = $"/finetune/download?ft_id={id}";
         if (checkpointStep > 0)
         {
             url += $"&checkpoint_step={checkpointStep}";
         }
-        
+
         checkpointType ??= DownloadCheckpointType.Default;
 
         var job = await RetrieveAsync(id, cancellationToken);
@@ -81,6 +75,7 @@ public class FineTuneClient(HttpClient httpClient) : BaseClient(httpClient)
             {
                 throw new ArgumentException("Only DEFAULT checkpoint type is allowed for FullTrainingType");
             }
+
             return url + "&checkpoint=modelOutputPath";
         }
 

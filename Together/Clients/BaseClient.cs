@@ -21,7 +21,7 @@ public abstract class BaseClient
             return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
         }
 
-        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken);
         if (errorResponse?.Error != null)
         {
             throw new Exception(errorResponse.Error.Message);
@@ -32,7 +32,8 @@ public abstract class BaseClient
         throw new Exception($"Request failed with status code {statusCode}: {errorContent}");
     }
 
-    protected async Task<TResponse> SendRequestAsync<TResponse>(string requestUri, HttpMethod method, HttpContent? content, CancellationToken cancellationToken)
+    protected async Task<TResponse> SendRequestAsync<TResponse>(string requestUri, HttpMethod method, HttpContent? content,
+        CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(method, requestUri);
         if (content != null)
@@ -47,7 +48,7 @@ public abstract class BaseClient
             return await HandleResponseAsync<TResponse>(responseMessage, cancellationToken);
         }
 
-        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken);
         if (errorResponse?.Error != null)
         {
             throw new Exception(errorResponse.Error.Message);
@@ -67,11 +68,11 @@ public abstract class BaseClient
                 return response;
             }
 
-            var result = await responseMessage.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
+            var result = await responseMessage.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
             return result!;
         }
 
-        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: cancellationToken);
+        var errorResponse = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken);
         if (errorResponse?.Error != null)
         {
             throw new Exception(errorResponse.Error.Message);

@@ -1,6 +1,4 @@
 using System.Net;
-using Moq;
-using Moq.Protected;
 using Together.Clients;
 using Together.Models.Images;
 
@@ -38,5 +36,4 @@ public class ImageClientTests : TestBase
         Assert.Single(result.Data);
         Assert.Equal("https://example.com/image.png", result.Data[0].Url);
     }
-    
 }

@@ -12,6 +12,7 @@ public class TogetherResponse(Dictionary<string, object> data, Dictionary<string
             {
                 return header.ToString();
             }
+
             return null;
         }
     }
@@ -20,15 +21,16 @@ public class TogetherResponse(Dictionary<string, object> data, Dictionary<string
     {
         get
         {
-            if (headers.TryGetValue("x-ratelimit-remaining", value: out var header))
+            if (headers.TryGetValue("x-ratelimit-remaining", out var header))
             {
                 return Convert.ToInt32(header);
             }
+
             return null;
         }
     }
 
-    public string?ProcessedBy
+    public string? ProcessedBy
     {
         get
         {
@@ -36,6 +38,7 @@ public class TogetherResponse(Dictionary<string, object> data, Dictionary<string
             {
                 return header.ToString();
             }
+
             return null;
         }
     }
@@ -46,8 +49,9 @@ public class TogetherResponse(Dictionary<string, object> data, Dictionary<string
         {
             if (headers.TryGetValue("x-total-time", out var h))
             {
-                return h == null ? (int?)null : Convert.ToInt32(Math.Round(Convert.ToDouble(h)));
+                return h == null ? null : Convert.ToInt32(Math.Round(Convert.ToDouble(h)));
             }
+
             return null;
         }
     }

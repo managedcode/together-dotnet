@@ -7,7 +7,8 @@ namespace Together.SemanticKernel.Services;
 [Experimental("SKEXP0001")]
 public class TogetherTextEmbeddingGenerationService : ITextEmbeddingGenerationService
 {
-    public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(IList<string> data, Kernel? kernel = null, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(IList<string> data, Kernel? kernel = null,
+        CancellationToken cancellationToken = new())
     {
         throw new NotImplementedException();
     }

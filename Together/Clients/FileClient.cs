@@ -5,14 +5,11 @@ namespace Together.Clients;
 
 public class FileClient(HttpClient httpClient) : BaseClient(httpClient)
 {
-    public async Task<FileResponse> UploadAsync(
-        string filePath, 
-        FilePurpose? purpose = null, 
-        bool checkFile = true, 
+    public async Task<FileResponse> UploadAsync(string filePath, FilePurpose? purpose = null, bool checkFile = true,
         CancellationToken cancellationToken = default)
     {
         purpose ??= FilePurpose.FineTune;
-        
+
         if (checkFile && !File.Exists(filePath))
         {
             throw new FileNotFoundException("File not found", filePath);
@@ -21,10 +18,11 @@ public class FileClient(HttpClient httpClient) : BaseClient(httpClient)
         using var form = new MultipartFormDataContent();
         using var fileStream = File.OpenRead(filePath);
         using var content = new StreamContent(fileStream);
-        
+
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         form.Add(content, "file", Path.GetFileName(filePath));
-        form.Add(new StringContent(purpose.ToString().ToLowerInvariant()), "purpose");
+        form.Add(new StringContent(purpose.ToString()
+            .ToLowerInvariant()), "purpose");
 
         return await SendRequestAsync<FileResponse>("/files", HttpMethod.Post, form, cancellationToken);
     }
@@ -47,7 +45,7 @@ public class FileClient(HttpClient httpClient) : BaseClient(httpClient)
 
         await using var fs = File.Create(fileName);
         await response.Content.CopyToAsync(fs, cancellationToken);
-        
+
         var fileInfo = new FileInfo(fileName);
         return new FileObject
         {
@@ -63,5 +61,8 @@ public class FileClient(HttpClient httpClient) : BaseClient(httpClient)
         return await SendRequestAsync<FileDeleteResponse>($"/files/{fileId}", HttpMethod.Delete, null, cancellationToken);
     }
 
-    private static string NormalizeKey(string key) => string.Join("_", key.Split(Path.GetInvalidFileNameChars()));
+    private static string NormalizeKey(string key)
+    {
+        return string.Join("_", key.Split(Path.GetInvalidFileNameChars()));
+    }
 }

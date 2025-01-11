@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Together\Together.csproj" />
+        <ProjectReference Include="..\Together\Together.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.33.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.33.0"/>
     </ItemGroup>
 
 
@@ -23,12 +23,11 @@
         <PackageTags>managedcode, sdk, dotnet, together, togetherai, together-dotnet, SemanticKernel</PackageTags>
     </PropertyGroup>
 
-    
-    
+
     <ItemGroup>
-      <Folder Include="Core\" />
-      <Folder Include="Extensions\" />
-      <Folder Include="Settings\" />
+        <Folder Include="Core\"/>
+        <Folder Include="Extensions\"/>
+        <Folder Include="Settings\"/>
     </ItemGroup>
 
 </Project>

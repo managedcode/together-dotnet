@@ -9,8 +9,8 @@ public class ModelClient(HttpClient httpClient) : BaseClient(httpClient)
     {
         var response = await httpClient.GetAsync("/models", cancellationToken);
         response.EnsureSuccessStatusCode();
-        
-        var result = await response.Content.ReadFromJsonAsync<List<ModelObject>>(cancellationToken: cancellationToken);
+
+        var result = await response.Content.ReadFromJsonAsync<List<ModelObject>>(cancellationToken);
         return result ?? new List<ModelObject>();
     }
 }

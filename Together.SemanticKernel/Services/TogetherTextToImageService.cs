@@ -9,8 +9,8 @@ public class TogetherTextToImageService : ITextToImageService
 {
     public IReadOnlyDictionary<string, object?> Attributes { get; }
 
-    public async Task<IReadOnlyList<ImageContent>> GetImageContentsAsync(TextContent input, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null,
-        CancellationToken cancellationToken = new CancellationToken())
+    public async Task<IReadOnlyList<ImageContent>> GetImageContentsAsync(TextContent input, PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null, CancellationToken cancellationToken = new())
     {
         throw new NotImplementedException();
     }

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Together.Models.Rerank;
 
 namespace Together.Clients;

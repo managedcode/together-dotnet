@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using Microsoft.Extensions.AI;
 using Moq;
 using Moq.Protected;
@@ -57,11 +56,11 @@ public class ChatCompletionClientTests : TestBase
     {
         // Arrange
         var streamContent = """
-            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"role":"assistant"},"index":0}]}
-            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"content":"Hello"},"index":0}]}
-            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"content":" world"},"index":0}]}
-            data: [DONE]
-            """;
+                            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"role":"assistant"},"index":0}]}
+                            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"content":"Hello"},"index":0}]}
+                            data: {"id":"1","object":"chat.completion.chunk","choices":[{"delta":{"content":" world"},"index":0}]}
+                            data: [DONE]
+                            """;
 
         var response = new HttpResponseMessage
         {
@@ -89,8 +88,12 @@ public class ChatCompletionClientTests : TestBase
 
         // Assert
         Assert.Equal(3, chunks.Count);
-        Assert.Equal("Hello", chunks[1].Choices[0].Delta?.Content);
-        Assert.Equal(" world", chunks[2].Choices[0].Delta?.Content);
+        Assert.Equal("Hello", chunks[1]
+            .Choices[0].Delta
+            ?.Content);
+        Assert.Equal(" world", chunks[2]
+            .Choices[0].Delta
+            ?.Content);
     }
 
     [Fact]
@@ -163,8 +166,14 @@ public class ChatCompletionClientTests : TestBase
 
         // Assert
         Assert.NotNull(result.Choices[0].Message.ToolCalls);
-        Assert.Equal("get_current_weather", result.Choices[0].Message.ToolCalls[0].Function.Name);
-        Assert.Contains("New York", result.Choices[0].Message.ToolCalls[0].Function.Arguments);
+        Assert.Equal("get_current_weather", result.Choices[0]
+            .Message
+            .ToolCalls[0].Function
+            .Name);
+        Assert.Contains("New York", result.Choices[0]
+            .Message
+            .ToolCalls[0].Function
+            .Arguments);
     }
 
     [Fact]
@@ -233,7 +242,10 @@ public class ChatCompletionClientTests : TestBase
         var result = await client.CreateAsync(request);
 
         // Assert
-        Assert.Equal("get_current_weather", result.Choices[0].Message.ToolCalls[0].Function.Name);
+        Assert.Equal("get_current_weather", result.Choices[0]
+            .Message
+            .ToolCalls[0].Function
+            .Name);
     }
 
     [Fact]
@@ -270,8 +282,7 @@ public class ChatCompletionClientTests : TestBase
     {
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
-        mockHandler
-            .Protected()
+        mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Network error"));
 

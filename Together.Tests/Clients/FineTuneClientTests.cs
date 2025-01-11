@@ -1,12 +1,8 @@
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
 using Together.Clients;
 using Together.Models.Finetune;
-using Xunit;
 
 namespace Together.Tests.Clients;
 
@@ -142,7 +138,9 @@ public class FineTuneClientTests : TestBase
         // Assert
         Assert.NotNull(result);
         Assert.Single(result.Data);
-        Assert.Equal("info", result.Data[0].Level.ToString());
+        Assert.Equal("info", result.Data[0]
+            .Level
+            .ToString());
         Assert.Equal("Test event message", result.Data[0].Message);
     }
 
@@ -190,10 +188,7 @@ public class FineTuneClientTests : TestBase
         // Arrange
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
-            .SetupSequence<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+            .SetupSequence<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
             // First request - retrieve fine-tune info
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -214,11 +209,7 @@ public class FineTuneClientTests : TestBase
         var client = new FineTuneClient(httpClient);
 
         // Act
-        var result = await client.DownloadAsync(
-            id: "ft-test-id",
-            outputPath: "test-output.bin",
-            checkpointStep: 1,
-            checkpointType: DownloadCheckpointType.Merged);
+        var result = await client.DownloadAsync("ft-test-id", "test-output.bin", 1, DownloadCheckpointType.Merged);
 
         // Assert
         Assert.NotNull(result);

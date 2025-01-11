@@ -1,19 +1,17 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using Microsoft.Extensions.AI;
 using Together.Models.ChatCompletions;
 using Together.Models.Completions;
 using Together.Models.Embeddings;
 using Together.Models.Images;
 using Together.Models.Rerank;
-using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace Together.Tests;
 
 public class IntegraionTests
 {
-    static string API_KEY= "API_KEY";
-    
+    private static readonly string API_KEY = "API_KEY";
+
     private HttpClient CreateHttpClient()
     {
         var httpClient = new HttpClient();
@@ -23,30 +21,31 @@ public class IntegraionTests
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return httpClient;
     }
-    
+
     [Fact
 #if !API_TEST
-        (Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task CompletionTest()
     {
         var client = new TogetherClient(CreateHttpClient());
-        
 
-        var responseAsync = await client.Completions.CreateAsync(new CompletionRequest()
+
+        var responseAsync = await client.Completions.CreateAsync(new CompletionRequest
         {
             Prompt = "Hi",
             Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             MaxTokens = 20
         });
-        
-        Assert.NotEmpty(responseAsync.Choices.First().Text);
+
+        Assert.NotEmpty(responseAsync.Choices.First()
+            .Text);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task ChatCompletionTest()
@@ -55,9 +54,9 @@ public class IntegraionTests
 
         var responseAsync = await client.ChatCompletions.CreateAsync(new ChatCompletionRequest
         {
-            Messages = new List<ChatCompletionMessage>()
+            Messages = new List<ChatCompletionMessage>
             {
-                new ChatCompletionMessage()
+                new()
                 {
                     Role = ChatRole.User,
                     Content = "Hi"
@@ -66,67 +65,70 @@ public class IntegraionTests
             Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             MaxTokens = 20
         });
-        
-        Assert.NotEmpty(responseAsync.Choices.First().Message.Content);
+
+        Assert.NotEmpty(responseAsync.Choices.First()
+            .Message.Content);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task StreamChatCompletionTest()
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.ChatCompletions.CreateStreamAsync(new ChatCompletionRequest
-        {
-            Messages = new List<ChatCompletionMessage>()
+        var responseAsync = await client.ChatCompletions
+            .CreateStreamAsync(new ChatCompletionRequest
             {
-                new ChatCompletionMessage()
+                Messages = new List<ChatCompletionMessage>
                 {
-                    Role = ChatRole.User,
-                    Content = "Hi"
-                }
-            },
-            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
-            MaxTokens = 20,
-            Stream = true
-        }).Select(s=> string.Join("",s.Choices.Select(c=>c.Delta.Content))).ToListAsync();
-        
-        
-        
+                    new()
+                    {
+                        Role = ChatRole.User,
+                        Content = "Hi"
+                    }
+                },
+                Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
+                MaxTokens = 20,
+                Stream = true
+            })
+            .Select(s => string.Join("", s.Choices.Select(c => c.Delta.Content)))
+            .ToListAsync();
+
+
         Assert.NotEmpty(responseAsync);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task EmbeddingTest()
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.Embeddings.CreateAsync(new EmbeddingRequest()
+        var responseAsync = await client.Embeddings.CreateAsync(new EmbeddingRequest
         {
             Input = "Hi",
-            Model = "togethercomputer/m2-bert-80M-2k-retrieval",
+            Model = "togethercomputer/m2-bert-80M-2k-retrieval"
         });
-        
+
         Assert.NotNull(responseAsync.Data);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task ImageTest()
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.Images.GenerateAsync(new ImageRequest()
+        var responseAsync = await client.Images.GenerateAsync(new ImageRequest
         {
             Model = "black-forest-labs/FLUX.1-dev",
             Prompt = "Cats eating popcorn",
@@ -135,13 +137,14 @@ public class IntegraionTests
             Height = 512,
             Width = 512
         });
-        
-        Assert.NotEmpty(responseAsync.Data.First().Url);
+
+        Assert.NotEmpty(responseAsync.Data.First()
+            .Url);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task ModelsTest()
@@ -149,30 +152,27 @@ public class IntegraionTests
         var client = new TogetherClient(CreateHttpClient());
 
         var responseAsync = await client.Models.ListModelsAsync();
-        
+
         Assert.NotEmpty(responseAsync);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task RerankTest()
     {
         var client = new TogetherClient(CreateHttpClient());
 
-        var responseAsync = await client.Rerank.CreateAsync(new RerankRequest()
-        {
-            
-        });
-        
+        var responseAsync = await client.Rerank.CreateAsync(new RerankRequest());
+
         Assert.NotEmpty(responseAsync.Results);
     }
-    
+
     [Fact
 #if !API_TEST
-(Skip = "This test is skipped because it requires a valid API key")
+            (Skip = "This test is skipped because it requires a valid API key")
 #endif
     ]
     public async Task WrongModelTest()
@@ -181,7 +181,7 @@ public class IntegraionTests
 
         await Assert.ThrowsAsync<Exception>(async () =>
         {
-            var responseAsync = await client.Images.GenerateAsync(new ImageRequest()
+            var responseAsync = await client.Images.GenerateAsync(new ImageRequest
             {
                 Model = "Wring-Model",
                 Prompt = "so wrong",

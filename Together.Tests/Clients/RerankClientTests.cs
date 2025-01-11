@@ -1,6 +1,4 @@
 using System.Net;
-using Moq;
-using Moq.Protected;
 using Together.Clients;
 using Together.Models.Rerank;
 
@@ -38,7 +36,9 @@ public class RerankClientTests : TestBase
         // Assert
         Assert.NotNull(result);
         Assert.Single(result.Results);
-        Assert.Equal(0.95, result.Results[0].RelevanceScore, precision: 7);
-        Assert.Equal("Test document", result.Results[0].Document.First());
+        Assert.Equal(0.95, result.Results[0].RelevanceScore, 7);
+        Assert.Equal("Test document", result.Results[0]
+            .Document
+            .First());
     }
 }
