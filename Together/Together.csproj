@@ -10,6 +10,10 @@
         <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.0.1-preview.1.24570.5"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
     <!--NuGet-->
     <PropertyGroup>
         <Title>Together.AI .NET SDK</Title>

@@ -8,18 +8,15 @@ using Together.Models.Rerank;
 
 namespace Together.Tests;
 
-public class IntegraionTests
+public class TogetherClientIntegraionTests
 {
     private static readonly string API_KEY = "API_KEY";
 
-    private HttpClient CreateHttpClient()
+    private TogetherClient CreateTogetherClient()
     {
         var httpClient = new HttpClient();
         httpClient.Timeout = TimeSpan.FromSeconds(TogetherConstants.TIMEOUT_SECS);
-        httpClient.BaseAddress = new Uri(TogetherConstants.BASE_URL);
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", API_KEY);
-        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        return httpClient;
+        return new TogetherClient(httpClient, API_KEY);
     }
 
     [Fact
@@ -29,7 +26,7 @@ public class IntegraionTests
     ]
     public async Task CompletionTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
 
         var responseAsync = await client.Completions.CreateAsync(new CompletionRequest
@@ -50,7 +47,7 @@ public class IntegraionTests
     ]
     public async Task ChatCompletionTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.ChatCompletions.CreateAsync(new ChatCompletionRequest
         {
@@ -77,7 +74,7 @@ public class IntegraionTests
     ]
     public async Task StreamChatCompletionTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.ChatCompletions
             .CreateStreamAsync(new ChatCompletionRequest
@@ -108,7 +105,7 @@ public class IntegraionTests
     ]
     public async Task EmbeddingTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.Embeddings.CreateAsync(new EmbeddingRequest
         {
@@ -126,7 +123,7 @@ public class IntegraionTests
     ]
     public async Task ImageTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.Images.GenerateAsync(new ImageRequest
         {
@@ -149,7 +146,7 @@ public class IntegraionTests
     ]
     public async Task ModelsTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.Models.ListModelsAsync();
 
@@ -163,7 +160,7 @@ public class IntegraionTests
     ]
     public async Task RerankTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         var responseAsync = await client.Rerank.CreateAsync(new RerankRequest());
 
@@ -177,7 +174,7 @@ public class IntegraionTests
     ]
     public async Task WrongModelTest()
     {
-        var client = new TogetherClient(CreateHttpClient());
+        var client = CreateTogetherClient();
 
         await Assert.ThrowsAsync<Exception>(async () =>
         {

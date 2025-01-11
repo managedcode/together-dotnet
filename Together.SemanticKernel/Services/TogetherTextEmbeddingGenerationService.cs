@@ -7,6 +7,17 @@ namespace Together.SemanticKernel.Services;
 [Experimental("SKEXP0001")]
 public class TogetherTextEmbeddingGenerationService : ITextEmbeddingGenerationService
 {
+    
+    public TogetherTextEmbeddingGenerationService(TogetherClient togetherClient, string model)
+    {
+        ArgumentNullException.ThrowIfNull(togetherClient);
+        ArgumentException.ThrowIfNullOrWhiteSpace(model);
+
+        // _client = togetherClient;
+        // _model = model;
+        // _attributes.Add("ModelId", model);
+    }
+    
     public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(IList<string> data, Kernel? kernel = null,
         CancellationToken cancellationToken = new())
     {

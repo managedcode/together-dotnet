@@ -9,8 +9,8 @@ public class ChatCompletionMessage
     public ChatRole Role { get; set; }
 
     [JsonPropertyName("content")]
-    public string Content { get; set; }
+    public string? Content { get; set; }
 
     [JsonPropertyName("tool_calls")]
-    public List<ToolCalls> ToolCalls { get; set; }
+    public List<ToolCalls> ToolCalls { get; set; } = new();
 }
