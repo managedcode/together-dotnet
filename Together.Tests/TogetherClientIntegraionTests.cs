@@ -14,9 +14,7 @@ public class TogetherClientIntegraionTests
 
     private TogetherClient CreateTogetherClient()
     {
-        var httpClient = new HttpClient();
-        httpClient.Timeout = TimeSpan.FromSeconds(TogetherConstants.TIMEOUT_SECS);
-        return new TogetherClient(httpClient, API_KEY);
+        return new TogetherClient(API_KEY);
     }
 
     [Fact

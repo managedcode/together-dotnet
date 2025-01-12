@@ -17,7 +17,7 @@ public static class KernelBuilderExtensions
         this IKernelBuilder builder,
         string model,
         string apiKey,
-        string endpoint,
+        string? endpoint = null,
         HttpClient? httpClient = null,
         string? serviceId = null)
     {
@@ -25,12 +25,12 @@ public static class KernelBuilderExtensions
 
         builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, (serviceProvider, _) =>
             new TogetherChatCompletionService(
-                new TogetherClient(GetHttpClient(httpClient, serviceProvider), apiKey, endpoint),
+                new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
                 model));
 
         builder.Services.AddKeyedSingleton<ITextGenerationService>(serviceId, (serviceProvider, _) =>
             new TogetherChatCompletionService(
-                new TogetherClient(GetHttpClient(httpClient, serviceProvider), apiKey, endpoint),
+                new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
                 model));
 
         return builder;
@@ -49,7 +49,7 @@ public static class KernelBuilderExtensions
 
         builder.Services.AddKeyedSingleton<ITextEmbeddingGenerationService>(serviceId, (serviceProvider, _) =>
             new TogetherTextEmbeddingGenerationService(
-                new TogetherClient(GetHttpClient(httpClient, serviceProvider), apiKey, endpoint),
+                new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
                 model));
 
         return builder;
@@ -68,7 +68,7 @@ public static class KernelBuilderExtensions
 
         builder.Services.AddKeyedSingleton<ITextToImageService>(serviceId, (serviceProvider, _) =>
             new TogetherTextToImageService(
-                new TogetherClient(GetHttpClient(httpClient, serviceProvider), apiKey, endpoint),
+                new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
                 model));
 
         return builder;
@@ -76,6 +76,6 @@ public static class KernelBuilderExtensions
 
     private static HttpClient GetHttpClient(HttpClient? httpClient, IServiceProvider serviceProvider)
     {
-        return httpClient ?? serviceProvider.GetRequiredService<HttpClient>();
+        return httpClient ?? serviceProvider.GetService<HttpClient>() ?? new HttpClient();
     }
 }

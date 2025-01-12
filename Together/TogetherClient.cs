@@ -7,12 +7,17 @@ public class TogetherClient
     private readonly HttpClient _httpClient;
     private const string BaseUrl = "https://api.together.xyz/";
 
-    public TogetherClient(HttpClient httpClient, string apiKey, string baseUrl = null)
+    public TogetherClient(string apiKey) : this(apiKey, new HttpClient()
     {
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(baseUrl ?? BaseUrl)
-        };
+        Timeout = TimeSpan.FromSeconds(TogetherConstants.TIMEOUT_SECS)
+    })
+    {
+    }
+
+    public TogetherClient(string apiKey, HttpClient httpClient,  string baseUrl = BaseUrl)
+    {
+        _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri(baseUrl);
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
         
         Completions = new CompletionClient(_httpClient);
