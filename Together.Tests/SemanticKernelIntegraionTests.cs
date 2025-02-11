@@ -21,8 +21,6 @@ namespace Together.Tests;
 public class SemanticKernelIntegraionTests
 {
     private static readonly string API_KEY = "API_KEY";
-    
-
 
 
     [Fact
@@ -34,13 +32,13 @@ public class SemanticKernelIntegraionTests
     public async Task InvokeOpenAiPromptAsyncTest()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion("meta-llama/Meta-Llama-3-70B-Instruct-Turbo", new Uri("https://api.together.xyz/v1"),  API_KEY)
+            .AddOpenAIChatCompletion("meta-llama/Meta-Llama-3-70B-Instruct-Turbo", new Uri("https://api.together.xyz/v1"), API_KEY)
             .Build();
 
         var answer = await kernel.InvokePromptAsync("Hi");
         answer.RenderedPrompt.ShouldNotBeEmpty();
     }
-    
+
     [Fact
 #if !API_TEST
             (Skip = "This test is skipped because it requires a valid API key")
@@ -50,35 +48,30 @@ public class SemanticKernelIntegraionTests
     public async Task FunctionCallTest()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", new Uri("https://api.together.xyz/v1"),  API_KEY)
+            .AddOpenAIChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", new Uri("https://api.together.xyz/v1"), API_KEY)
             .Build();
-        
+
         bool call = false;
-        
-        kernel.Plugins.AddFromFunctions("time_plugin",
-        [
-            KernelFunctionFactory.CreateFromMethod(
-                method: () =>
-                {
-                    call = true;
-                    return DateTime.Now;
-                },
-                functionName: "get_time",
-                description: "Get the current time"
-            )
+
+        kernel.Plugins.AddFromFunctions("time_plugin", [
+            KernelFunctionFactory.CreateFromMethod(method: () =>
+            {
+                call = true;
+                return DateTime.Now;
+            }, functionName: "get_time", description: "Get the current time")
         ]);
 
         var message = await kernel.GetRequiredService<IChatCompletionService>()
             .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings()
             {
-               FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             }, kernel);
-        
+
         var answer = await kernel.InvokePromptAsync("What is the current time?");
         answer.RenderedPrompt.ShouldNotBeEmpty();
         call.ShouldBeTrue();
     }
-    
+
     [Fact
 #if !API_TEST
             (Skip = "This test is skipped because it requires a valid API key")
@@ -87,12 +80,13 @@ public class SemanticKernelIntegraionTests
     public async Task InvokePromptAsyncTest()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddTogetherChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", API_KEY).Build();
+            .AddTogetherChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", API_KEY)
+            .Build();
 
         var answer = await kernel.InvokePromptAsync("Hi");
         answer.RenderedPrompt.ShouldNotBeEmpty();
     }
-    
+
     [Fact
 #if !API_TEST
             (Skip = "This test is skipped because it requires a valid API key")
@@ -101,34 +95,30 @@ public class SemanticKernelIntegraionTests
     public async Task CompletionTest()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddTogetherChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", API_KEY).Build();
+            .AddTogetherChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", API_KEY)
+            .Build();
 
         bool call = false;
-        
-        kernel.Plugins.AddFromFunctions("time_plugin",
-        [
-            KernelFunctionFactory.CreateFromMethod(
-                method: () =>
-                {
-                    call = true;
-                    return DateTime.Now;
-                },
-                functionName: "get_time",
-                description: "Get the current time"
-            )
+
+        kernel.Plugins.AddFromFunctions("time_plugin", [
+            KernelFunctionFactory.CreateFromMethod(method: () =>
+            {
+                call = true;
+                return DateTime.Now;
+            }, functionName: "get_time", description: "Get the current time")
         ]);
-        
+
         var message = await kernel.GetRequiredService<IChatCompletionService>()
             .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings()
             {
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             }, kernel);
-        
+
         var answer = await kernel.InvokePromptAsync("What is the current time?");
         answer.RenderedPrompt.ShouldNotBeEmpty();
         call.ShouldBeTrue();
     }
-    
+
     [Fact
 #if !API_TEST
             (Skip = "This test is skipped because it requires a valid API key")
@@ -138,11 +128,12 @@ public class SemanticKernelIntegraionTests
     public async Task ImageTest()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddTogetherTextToImage("black-forest-labs/FLUX.1-dev", API_KEY).Build();
+            .AddTogetherTextToImage("black-forest-labs/FLUX.1-dev", API_KEY)
+            .Build();
 
 
         var imageService = kernel.GetRequiredService<ITextToImageService>();
-        
+
         var images = await imageService.GetImageContentsAsync(new TextContent()
         {
             Text = "Cats eating popcorn"
@@ -151,12 +142,14 @@ public class SemanticKernelIntegraionTests
             Height = 512,
             Width = 512
         });
-        
-        
+
+
         images.Count.ShouldBePositive();
-        images.First().Uri.ShouldNotBeNull();
+        images.First()
+            .Uri
+            .ShouldNotBeNull();
     }
-    
+
     [Fact
 #if !API_TEST
             (Skip = "This test is skipped because it requires a valid API key")
@@ -166,7 +159,8 @@ public class SemanticKernelIntegraionTests
     public async Task Embedded()
     {
         var kernel = Kernel.CreateBuilder()
-            .AddTogetherTextEmbeddingGeneration("togethercomputer/m2-bert-80M-2k-retrieval", API_KEY).Build();
+            .AddTogetherTextEmbeddingGeneration("togethercomputer/m2-bert-80M-2k-retrieval", API_KEY)
+            .Build();
 
 
         var embedding = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
@@ -176,9 +170,7 @@ public class SemanticKernelIntegraionTests
             "Cats eating popcorn"
         });
 
-        
-        
+
         embeddings.Count.ShouldBePositive();
     }
 }
-

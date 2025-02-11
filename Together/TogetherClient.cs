@@ -4,10 +4,10 @@ namespace Together;
 
 public class TogetherClient
 {
-    private readonly HttpClient _httpClient;
     private const string BaseUrl = "https://api.together.xyz/";
+    private readonly HttpClient _httpClient;
 
-    public TogetherClient(string apiKey) : this(apiKey, new HttpClient()
+    public TogetherClient(string apiKey) : this(apiKey, new HttpClient
     {
         Timeout = TimeSpan.FromSeconds(TogetherConstants.TIMEOUT_SECS)
     })
@@ -16,20 +16,20 @@ public class TogetherClient
 
     public TogetherClient(string apiKey, HttpClient httpClient, string? baseUrl = null)
     {
-        if(string.IsNullOrWhiteSpace(apiKey))
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw new ArgumentException("API key is required", nameof(apiKey));
         }
-        
-        if(string.IsNullOrWhiteSpace(baseUrl))
+
+        if (string.IsNullOrWhiteSpace(baseUrl))
         {
             baseUrl = BaseUrl;
         }
-        
+
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(baseUrl);
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-        
+
         Completions = new CompletionClient(_httpClient);
         ChatCompletions = new ChatCompletionClient(_httpClient);
         Embeddings = new EmbeddingClient(_httpClient);

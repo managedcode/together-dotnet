@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.TextToImage;
-using Together.Models.ChatCompletions;
 using Together.Models.Images;
 
 namespace Together.SemanticKernel.Services;
@@ -12,10 +11,10 @@ namespace Together.SemanticKernel.Services;
 [Experimental("SKEXP0001")]
 public class TogetherTextToImageService : ITextToImageService
 {
-    private readonly TogetherClient _client;
-    private readonly string _model;
     private readonly Dictionary<string, object?> _attributes = new();
+    private readonly TogetherClient _client;
     private readonly ILogger _logger;
+    private readonly string _model;
 
     public TogetherTextToImageService(TogetherClient togetherClient, string model, ILogger? logger = null)
     {
@@ -30,11 +29,8 @@ public class TogetherTextToImageService : ITextToImageService
 
     public IReadOnlyDictionary<string, object?> Attributes => _attributes;
 
-    public async Task<IReadOnlyList<ImageContent>> GetImageContentsAsync(
-        TextContent input,
-        PromptExecutionSettings? executionSettings = null,
-        Kernel? kernel = null,
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ImageContent>> GetImageContentsAsync(TextContent input, PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentException.ThrowIfNullOrWhiteSpace(input.Text);
@@ -47,8 +43,8 @@ public class TogetherTextToImageService : ITextToImageService
             {
                 Model = _model,
                 Prompt = input.Text,
-                Width = 1024,  // default values
-                Height = 1024,
+                Width = 1024, // default values
+                Height = 1024
             };
 
             if (executionSettings is TogetherTextToImageExecutionSettings settings)
@@ -63,7 +59,7 @@ public class TogetherTextToImageService : ITextToImageService
             ValidateImageRequest(request);
 
             var response = await _client.Images.GenerateAsync(request, cancellationToken);
-            
+
             if (response?.Data == null || response.Data.Count == 0)
             {
                 throw new KernelException("No image data received from Together.AI");
@@ -86,10 +82,7 @@ public class TogetherTextToImageService : ITextToImageService
                 throw new KernelException("No valid images were generated");
             }
 
-            _logger.LogInformation(
-                "Generated {Count} images for prompt: {Prompt}",
-                results.Count,
-                input.Text);
+            _logger.LogInformation("Generated {Count} images for prompt: {Prompt}", results.Count, input.Text);
 
             return results;
         }
@@ -106,14 +99,17 @@ public class TogetherTextToImageService : ITextToImageService
         {
             request.Width = settings.Width.Value;
         }
+
         if (settings.Height.HasValue)
         {
             request.Height = settings.Height.Value;
         }
+
         if (!string.IsNullOrEmpty(settings.NegativePrompt))
         {
             request.NegativePrompt = settings.NegativePrompt;
         }
+
         if (settings.Seed.HasValue)
         {
             request.Seed = settings.Seed.Value;
@@ -126,14 +122,17 @@ public class TogetherTextToImageService : ITextToImageService
         {
             request.Width = widthValue;
         }
+
         if (settings.TryGetValue("height", out var height) && height is int heightValue)
         {
             request.Height = heightValue;
         }
+
         if (settings.TryGetValue("negative_prompt", out var negativePrompt) && negativePrompt is string negativePromptValue)
         {
             request.NegativePrompt = negativePromptValue;
         }
+
         if (settings.TryGetValue("seed", out var seed) && seed is ulong seedValue)
         {
             request.Seed = seedValue;
@@ -146,6 +145,7 @@ public class TogetherTextToImageService : ITextToImageService
         {
             throw new ArgumentOutOfRangeException(nameof(request.Width), "Width must be between 128 and 1024 pixels");
         }
+
         if (request.Height is < 128 or > 1024)
         {
             throw new ArgumentOutOfRangeException(nameof(request.Height), "Height must be between 128 and 1024 pixels");
@@ -153,7 +153,9 @@ public class TogetherTextToImageService : ITextToImageService
     }
 
     private static bool IsValidImageOutput(ImageChoicesData image)
-        => !string.IsNullOrEmpty(image.Url) || image.B64Json != null;
+    {
+        return !string.IsNullOrEmpty(image.Url) || image.B64Json != null;
+    }
 
     private static ImageContent CreateImageContent(ImageChoicesData image, TextContent input)
     {
@@ -163,8 +165,6 @@ public class TogetherTextToImageService : ITextToImageService
             { "prompt", input.Text }
         };
 
-        return !string.IsNullOrEmpty(image.Url)
-            ? new ImageContent(new Uri(image.Url))
-            : new ImageContent(image.B64Json);
+        return !string.IsNullOrEmpty(image.Url) ? new ImageContent(new Uri(image.Url)) : new ImageContent(image.B64Json);
     }
 }

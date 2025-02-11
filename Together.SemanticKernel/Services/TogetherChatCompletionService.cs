@@ -22,7 +22,10 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
     private const int MaxInflightAutoInvokes = 128;
     private static readonly Meter s_meter = new("Microsoft.SemanticKernel.Connectors.Together");
     private static readonly Counter<int> s_promptTokensCounter = s_meter.CreateCounter<int>("semantic_kernel.connectors.together.tokens.prompt");
-    private static readonly Counter<int> s_completionTokensCounter = s_meter.CreateCounter<int>("semantic_kernel.connectors.together.tokens.completion");
+
+    private static readonly Counter<int> s_completionTokensCounter =
+        s_meter.CreateCounter<int>("semantic_kernel.connectors.together.tokens.completion");
+
     private static readonly Counter<int> s_totalTokensCounter = s_meter.CreateCounter<int>("semantic_kernel.connectors.together.tokens.total");
 
     private readonly TogetherClient _client;
@@ -43,22 +46,20 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
 
     public IReadOnlyDictionary<string, object?> Attributes => _attributes;
 
-    public async Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(
-        ChatHistory chatHistory,
-        PromptExecutionSettings? executionSettings = null,
-        Kernel? kernel = null,
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(ChatHistory chatHistory,
+        PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, CancellationToken cancellationToken = default)
     {
         try
         {
             using var activity = StartActivity("ChatCompletion");
-            
-            for (int requestIndex = 0; ; requestIndex++)
+
+            for (int requestIndex = 0;; requestIndex++)
             {
                 var request = new ChatCompletionRequest
                 {
                     Model = _model,
-                    Messages = chatHistory.ToChatCompletionMessages().ToList(),
+                    Messages = chatHistory.ToChatCompletionMessages()
+                        .ToList(),
                     Stream = false
                 };
 
@@ -69,31 +70,35 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                 }
 
                 var response = await _client.ChatCompletions.CreateAsync(request, cancellationToken);
-                LogUsage(new UsageData 
-                { 
+                LogUsage(new UsageData
+                {
                     PromptTokens = response.Usage.PromptTokens,
                     CompletionTokens = response.Usage.CompletionTokens,
                     TotalTokens = response.Usage.TotalTokens
                 });
 
-                if (response.Choices?.FirstOrDefault()?.Message == null)
+                if (response.Choices?.FirstOrDefault()
+                        ?.Message == null)
                     return Array.Empty<ChatMessageContent>();
 
                 var result = response.Choices.First();
-                var messageContent = CreateChatMessageContent(new ChatCompletionMessage 
-                { 
+                var messageContent = CreateChatMessageContent(new ChatCompletionMessage
+                {
                     Role = result.Message.Role,
                     Content = result.Message.Content,
-                    ToolCalls = result.Message.ToolCalls.Select(t => new ToolCall 
-                    { 
-                        Id = t.Id,
-                        Type = t.Type,
-                        Function = new FunctionCall 
-                        { 
-                            Name = t.Function.Name,
-                            Arguments = t.Function.Arguments
-                        }
-                    }).ToList()
+                    ToolCalls = result.Message
+                        .ToolCalls
+                        .Select(t => new ToolCall
+                        {
+                            Id = t.Id,
+                            Type = t.Type,
+                            Function = new FunctionCall
+                            {
+                                Name = t.Function.Name,
+                                Arguments = t.Function.Arguments
+                            }
+                        })
+                        .ToList()
                 });
 
                 // If no tool calls or no auto-invoke, return response
@@ -105,16 +110,16 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                 // Process tool calls asynchronously
                 foreach (var toolCall in result.Message.ToolCalls)
                 {
-                    if (!await ProcessToolCallAsync(new ToolCall 
-                    { 
-                        Id = toolCall.Id,
-                        Type = toolCall.Type,
-                        Function = new FunctionCall 
-                        { 
-                            Name = toolCall.Function.Name,
-                            Arguments = toolCall.Function.Arguments
-                        }
-                    }, kernel, chatHistory, cancellationToken))
+                    if (!await ProcessToolCallAsync(new ToolCall
+                        {
+                            Id = toolCall.Id,
+                            Type = toolCall.Type,
+                            Function = new FunctionCall
+                            {
+                                Name = toolCall.Function.Name,
+                                Arguments = toolCall.Function.Arguments
+                            }
+                        }, kernel, chatHistory, cancellationToken))
                     {
                         _logger.LogWarning("Failed to process tool call: {ToolCall}", toolCall.Function?.Name);
                         continue;
@@ -122,12 +127,18 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                 }
 
                 // Get final response with function results
-                request.Messages = chatHistory.ToChatCompletionMessages().ToList();
+                request.Messages = chatHistory.ToChatCompletionMessages()
+                    .ToList();
                 var finalResponse = await _client.ChatCompletions.CreateAsync(request, cancellationToken);
 
-                if (finalResponse?.Choices?.FirstOrDefault()?.Message != null)
+                if (finalResponse?.Choices?.FirstOrDefault()
+                        ?.Message != null)
                 {
-                    return new[] { CreateChatMessageContent(finalResponse.Choices.First().Message) };
+                    return new[]
+                    {
+                        CreateChatMessageContent(finalResponse.Choices.First()
+                            .Message)
+                    };
                 }
             }
         }
@@ -139,11 +150,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
     }
 
     // Modified to async: renamed to ProcessToolCallAsync
-    private async Task<bool> ProcessToolCallAsync(
-        ToolCall toolCall, 
-        Kernel? kernel,
-        ChatHistory chatHistory,
-        CancellationToken cancellationToken)
+    private async Task<bool> ProcessToolCallAsync(ToolCall toolCall, Kernel? kernel, ChatHistory chatHistory, CancellationToken cancellationToken)
     {
         if (kernel == null || string.IsNullOrEmpty(toolCall.Function?.Name))
             return false;
@@ -160,12 +167,9 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             var args = ParseArguments(toolCall.Function.Arguments);
             // Await asynchronous function invocation instead of using .Result
             var result = await function.InvokeAsync(kernel, args, cancellationToken);
-            
-            chatHistory.Add(new ChatMessageContent(
-                AuthorRole.Tool, 
-                result.GetValue<string>(),
-                metadata: new Dictionary<string, object?> { { "tool_call_id", toolCall.Id } }
-            ));
+
+            chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, result.GetValue<string>(),
+                metadata: new Dictionary<string, object?> { { "tool_call_id", toolCall.Id } }));
 
             return true;
         }
@@ -198,7 +202,9 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             return new ToolConfiguration(false, false, 0);
 
         // Check if kernel has any plugins/functions available
-        var hasTools = kernel.Plugins.GetFunctionsMetadata().Any();
+        var hasTools = kernel.Plugins
+            .GetFunctionsMetadata()
+            .Any();
         if (!hasTools)
             return new ToolConfiguration(false, false, 0);
 
@@ -208,14 +214,12 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
 
         if (settings?.ExtensionData != null)
         {
-            autoInvoke = settings.ExtensionData.TryGetValue("auto_invoke", out var autoInvokeObj) && 
-                         autoInvokeObj is bool autoInvokeValue && 
+            autoInvoke = settings.ExtensionData.TryGetValue("auto_invoke", out var autoInvokeObj) && autoInvokeObj is bool autoInvokeValue &&
                          autoInvokeValue;
 
-            maxAttempts = settings.ExtensionData.TryGetValue("max_attempts", out var maxAttemptsObj) &&
-                         maxAttemptsObj is int maxAttemptsValue
-                         ? maxAttemptsValue 
-                         : 1;
+            maxAttempts = settings.ExtensionData.TryGetValue("max_attempts", out var maxAttemptsObj) && maxAttemptsObj is int maxAttemptsValue
+                ? maxAttemptsValue
+                : 1;
         }
 
         // Disable auto-invoke if we've exceeded attempts limit
@@ -232,9 +236,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
     private FunctionName ParseFunctionName(string fullName)
     {
         var parts = fullName.Split(':');
-        return parts.Length > 1 
-            ? new FunctionName(parts[0], parts[1])
-            : new FunctionName(string.Empty, parts[0]);
+        return parts.Length > 1 ? new FunctionName(parts[0], parts[1]) : new FunctionName(string.Empty, parts[0]);
     }
 
     private Activity? StartActivity(string name) =>
@@ -243,26 +245,20 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
     private void LogUsage(UsageData? usage)
     {
         if (usage == null) return;
-    
+
         s_promptTokensCounter.Add(usage.PromptTokens);
         s_completionTokensCounter.Add(usage.CompletionTokens);
         s_totalTokensCounter.Add(usage.TotalTokens);
-    
-        _logger.LogInformation(
-            "Tokens - Prompt: {PromptTokens}, Completion: {CompletionTokens}, Total: {TotalTokens}",
-            usage.PromptTokens,
-            usage.CompletionTokens,
-            usage.TotalTokens);
+
+        _logger.LogInformation("Tokens - Prompt: {PromptTokens}, Completion: {CompletionTokens}, Total: {TotalTokens}", usage.PromptTokens,
+            usage.CompletionTokens, usage.TotalTokens);
     }
 
     private ChatMessageContent CreateChatMessageContent(ChatCompletionMessage message) =>
-        new ChatMessageContent(
-            AuthorRole.Assistant,
-            message.Content,
-            metadata: new Dictionary<string, object?>
-            {
-                { "tool_calls", message.ToolCalls }
-            });
+        new ChatMessageContent(AuthorRole.Assistant, message.Content, metadata: new Dictionary<string, object?>
+        {
+            { "tool_calls", message.ToolCalls }
+        });
 
     private void ConfigureTools(Kernel kernel, ChatCompletionRequest request)
     {
@@ -271,38 +267,41 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             return;
 
         request.Tools = functions.Select(f => new Together.Models.ChatCompletions.Tool
-        {
-            Type = "function",
-            Function = new Together.Models.ChatCompletions.FunctionTool
             {
-                Name = $"{f.PluginName}:{f.Name}",
-                Description = f.Description,
-                Parameters = new Dictionary<string, object>
+                Type = "function",
+                Function = new Together.Models.ChatCompletions.FunctionTool
                 {
-                    { "type", "object" },
-                    { "properties", f.Parameters.ToDictionary(
-                        p => p.Name,
-                        p => new { type = p.ParameterType?.Name.ToLower(), description = p.Description })
-                    },
-                    { "required", f.Parameters.Where(p => p.IsRequired).Select(p => p.Name).ToList() }
+                    Name = $"{f.PluginName}:{f.Name}",
+                    Description = f.Description,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "type", "object" },
+                        {
+                            "properties",
+                            f.Parameters.ToDictionary(p => p.Name, p => new { type = p.ParameterType?.Name.ToLower(), description = p.Description })
+                        },
+                        {
+                            "required", f.Parameters
+                                .Where(p => p.IsRequired)
+                                .Select(p => p.Name)
+                                .ToList()
+                        }
+                    }
                 }
-            }
-        }).ToList();
+            })
+            .ToList();
 
-        request.ToolChoice = new Together.Models.ChatCompletions.ToolChoice 
-        { 
+        request.ToolChoice = new Together.Models.ChatCompletions.ToolChoice
+        {
             Type = "auto",
             Function = new Together.Models.ChatCompletions.FunctionToolChoice { Name = "auto" }
         };
     }
 
-    public async IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(
-        ChatHistory chatHistory,
-        PromptExecutionSettings? executionSettings = null,
-        Kernel? kernel = null,
+    public async IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(ChatHistory chatHistory,
+        PromptExecutionSettings? executionSettings = null, Kernel? kernel = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-
         var request = new ChatCompletionRequest
         {
             Model = _model,
@@ -314,23 +313,21 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
         {
             ConfigureTools(kernel, request);
         }
-        
+
         var stream = _client.ChatCompletions.CreateStreamAsync(request, cancellationToken);
 
         await foreach (var chunk in stream)
         {
             foreach (var choice in chunk.Choices)
             {
-                yield return new StreamingChatMessageContent(AuthorRole.Assistant, choice.Delta?.Content, null, choice.Index.GetValueOrDefault(), chunk.Model);
+                yield return new StreamingChatMessageContent(AuthorRole.Assistant, choice.Delta?.Content, null, choice.Index.GetValueOrDefault(),
+                    chunk.Model);
             }
         }
     }
 
-    public Task<IReadOnlyList<TextContent>> GetTextContentsAsync(
-        string prompt,
-        PromptExecutionSettings? executionSettings = null,
-        Kernel? kernel = null,
-        CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<TextContent>> GetTextContentsAsync(string prompt, PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null, CancellationToken cancellationToken = default)
     {
         // Convert text prompt to chat format
         var chatHistory = new ChatHistory();
@@ -341,10 +338,8 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                 .ToList(), cancellationToken);
     }
 
-    public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(
-        string prompt,
-        PromptExecutionSettings? executionSettings = null,
-        Kernel? kernel = null,
+    public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(string prompt,
+        PromptExecutionSettings? executionSettings = null, Kernel? kernel = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var chatHistory = new ChatHistory();
@@ -356,10 +351,8 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
         }
     }
 
-    private async Task<ChatCompletionResponse> GetCompletionAsync(
-        IEnumerable<ChatCompletionMessage> messages,
-        PromptExecutionSettings? settings = null,
-        CancellationToken cancellationToken = default)
+    private async Task<ChatCompletionResponse> GetCompletionAsync(IEnumerable<ChatCompletionMessage> messages,
+        PromptExecutionSettings? settings = null, CancellationToken cancellationToken = default)
     {
         // var options = new Dictionary<string, object>();
         //
@@ -378,7 +371,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             Stream = false,
             //Options = options
         };
-        
+
         return await _client.ChatCompletions.CreateAsync(request, cancellationToken);
     }
 }

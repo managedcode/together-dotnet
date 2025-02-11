@@ -14,14 +14,19 @@ public class TogetherTextEmbeddingGenerationService : ITextEmbeddingGenerationSe
 {
     private const int BatchSize = 20; // Adjust based on API limits
     private static readonly Meter s_meter = new("Microsoft.SemanticKernel.Connectors.Together");
-    private static readonly Counter<int> s_embeddingRequestsCounter = s_meter.CreateCounter<int>("semantic_kernel.connectors.together.embedding.requests");
-    private static readonly Counter<int> s_embeddingTokensCounter = s_meter.CreateCounter<int>("semantic_kernel.connectors.together.embedding.tokens");
+
+    private static readonly Counter<int> s_embeddingRequestsCounter =
+        s_meter.CreateCounter<int>("semantic_kernel.connectors.together.embedding.requests");
+
+    private static readonly Counter<int> s_embeddingTokensCounter =
+        s_meter.CreateCounter<int>("semantic_kernel.connectors.together.embedding.tokens");
+
+    private readonly Dictionary<string, object?> _attributes = new();
 
     private readonly TogetherClient _client;
-    private readonly string _model;
-    private readonly Dictionary<string, object?> _attributes = new();
     private readonly ILogger _logger;
-    
+    private readonly string _model;
+
     public TogetherTextEmbeddingGenerationService(TogetherClient togetherClient, string model, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(togetherClient);
@@ -32,25 +37,25 @@ public class TogetherTextEmbeddingGenerationService : ITextEmbeddingGenerationSe
         _logger = logger ?? NullLogger.Instance;
         _attributes.Add("ModelId", model);
     }
-    
+
     public IReadOnlyDictionary<string, object?> Attributes => _attributes;
 
-    public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(
-        IList<string> data, 
-        Kernel? kernel = null,
+    public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(IList<string> data, Kernel? kernel = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(data);
-        
+
         try
         {
             using var activity = Activity.Current?.Source.StartActivity("GenerateEmbeddings");
             var results = new List<ReadOnlyMemory<float>>();
 
             // Process in batches to avoid potential API limits
-            for (int i = 0; i < data.Count; i += BatchSize)
+            for (var i = 0; i < data.Count; i += BatchSize)
             {
-                var batchItems = data.Skip(i).Take(BatchSize).ToList();
+                var batchItems = data.Skip(i)
+                    .Take(BatchSize)
+                    .ToList();
                 var response = await _client.Embeddings.CreateAsync(new EmbeddingRequest
                 {
                     Input = batchItems,

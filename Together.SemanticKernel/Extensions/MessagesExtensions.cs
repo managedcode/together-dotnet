@@ -14,7 +14,7 @@ public static class MessagesExtensions
         return new ChatCompletionMessage
         {
             Role = new ChatRole(messageContent.Role.ToString()),
-            Content = messageContent.Content,
+            Content = messageContent.Content
         };
     }
 

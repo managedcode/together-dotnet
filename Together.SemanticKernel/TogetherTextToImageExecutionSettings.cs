@@ -6,69 +6,77 @@ namespace Together.SemanticKernel;
 [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
 public sealed class TogetherTextToImageExecutionSettings : PromptExecutionSettings
 {
+    private int? _height = 1024;
+    private int? _n = 1;
+    private string? _negativePrompt;
+    private ulong? _seed;
+
+    private int? _steps = 20;
+    private int? _width = 1024;
+
     [JsonPropertyName("steps")]
     public int? Steps
     {
-        get => this._steps;
+        get => _steps;
         set
         {
             ThrowIfFrozen();
-            this._steps = value;
+            _steps = value;
         }
     }
 
     [JsonPropertyName("seed")]
     public ulong? Seed
     {
-        get => this._seed;
+        get => _seed;
         set
         {
             ThrowIfFrozen();
-            this._seed = value;
+            _seed = value;
         }
     }
 
     [JsonPropertyName("n")]
     public int? N
     {
-        get => this._n;
+        get => _n;
         set
         {
             ThrowIfFrozen();
-            this._n = value;
+            _n = value;
         }
     }
 
     [JsonPropertyName("height")]
     public int? Height
     {
-        get => this._height;
+        get => _height;
         set
         {
             ThrowIfFrozen();
-            this._height = value;
+            _height = value;
         }
     }
 
     [JsonPropertyName("width")]
     public int? Width
     {
-        get => this._width;
+        get => _width;
         set
         {
             ThrowIfFrozen();
-            this._width = value;
+            _width = value;
         }
     }
 
     [JsonPropertyName("negative_prompt")]
     public string? NegativePrompt
     {
-        get => this._negativePrompt;
+        get => _negativePrompt;
         set
         {
             ThrowIfFrozen();
-            this._negativePrompt = value;
+            _negativePrompt = value;
         }
     }
 
@@ -76,21 +84,14 @@ public sealed class TogetherTextToImageExecutionSettings : PromptExecutionSettin
     {
         return new TogetherTextToImageExecutionSettings
         {
-            ModelId = this.ModelId,
-            Steps = this.Steps,
-            Seed = this.Seed,
-            N = this.N,
-            Height = this.Height,
-            Width = this.Width,
-            NegativePrompt = this.NegativePrompt,
-            ExtensionData = this.ExtensionData != null ? new Dictionary<string, object>(this.ExtensionData) : null
+            ModelId = ModelId,
+            Steps = Steps,
+            Seed = Seed,
+            N = N,
+            Height = Height,
+            Width = Width,
+            NegativePrompt = NegativePrompt,
+            ExtensionData = ExtensionData != null ? new Dictionary<string, object>(ExtensionData) : null
         };
     }
-
-    private int? _steps = 20;
-    private ulong? _seed;
-    private int? _n = 1;
-    private int? _height = 1024;
-    private int? _width = 1024;
-    private string? _negativePrompt;
 }

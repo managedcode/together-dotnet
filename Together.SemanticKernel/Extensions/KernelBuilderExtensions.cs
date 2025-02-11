@@ -12,102 +12,79 @@ namespace Together.SemanticKernel.Extensions;
 
 public static class KernelBuilderExtensions
 {
-    public static IKernelBuilder AddTogetherChatCompletion(
-        this IKernelBuilder builder,
-        string model,
-        string apiKey,
-        string? endpoint = null,
-        HttpClient? httpClient = null,
-        string? serviceId = null)
+    public static IKernelBuilder AddTogetherChatCompletion(this IKernelBuilder builder, string model, string apiKey, string? endpoint = null,
+        HttpClient? httpClient = null, string? serviceId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(model);
 
         if (string.IsNullOrEmpty(serviceId))
         {
             builder.Services.AddSingleton<IChatCompletionService>(serviceProvider =>
-                new TogetherChatCompletionService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model, serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
+                new TogetherChatCompletionService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model,
+                    serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
 
             builder.Services.AddSingleton<ITextGenerationService>(serviceProvider =>
-                new TogetherChatCompletionService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model, serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
+                new TogetherChatCompletionService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model,
+                    serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
         }
         else
         {
-            builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, (serviceProvider, _) =>
-                new TogetherChatCompletionService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model, serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
+            builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId,
+                (serviceProvider, _) =>
+                    new TogetherChatCompletionService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model,
+                        serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
 
-            builder.Services.AddKeyedSingleton<ITextGenerationService>(serviceId, (serviceProvider, _) =>
-                new TogetherChatCompletionService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model, serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
+            builder.Services.AddKeyedSingleton<ITextGenerationService>(serviceId,
+                (serviceProvider, _) =>
+                    new TogetherChatCompletionService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model,
+                        serviceProvider.GetService<ILogger<TogetherChatCompletionService>>()));
         }
-
 
 
         return builder;
     }
 
     [Experimental("SKEXP0001")]
-    public static IKernelBuilder AddTogetherTextEmbeddingGeneration(
-        this IKernelBuilder builder,
-        string model,
-        string apiKey,
-        string? endpoint = null,
-        HttpClient? httpClient = null,
-        string? serviceId = null)
+    public static IKernelBuilder AddTogetherTextEmbeddingGeneration(this IKernelBuilder builder, string model, string apiKey, string? endpoint = null,
+        HttpClient? httpClient = null, string? serviceId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(model);
 
         if (string.IsNullOrEmpty(serviceId))
         {
             builder.Services.AddSingleton<ITextEmbeddingGenerationService>(serviceProvider =>
-                new TogetherTextEmbeddingGenerationService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model));
+                new TogetherTextEmbeddingGenerationService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model));
         }
         else
-        {     
-            builder.Services.AddKeyedSingleton<ITextEmbeddingGenerationService>(serviceId, (serviceProvider, _) =>
-                new TogetherTextEmbeddingGenerationService(
-                new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                model));
+        {
+            builder.Services.AddKeyedSingleton<ITextEmbeddingGenerationService>(serviceId,
+                (serviceProvider, _) =>
+                    new TogetherTextEmbeddingGenerationService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
+                        model));
         }
-  
+
 
         return builder;
     }
 
     [Experimental("SKEXP0001")]
-    public static IKernelBuilder AddTogetherTextToImage(
-        this IKernelBuilder builder,
-        string model,
-        string apiKey,
-        string? endpoint = null,
-        HttpClient? httpClient = null,
-        string? serviceId = null)
+    public static IKernelBuilder AddTogetherTextToImage(this IKernelBuilder builder, string model, string apiKey, string? endpoint = null,
+        HttpClient? httpClient = null, string? serviceId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(model);
 
         if (string.IsNullOrEmpty(serviceId))
         {
             builder.Services.AddSingleton<ITextToImageService>(serviceProvider =>
-                new TogetherTextToImageService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model));
+                new TogetherTextToImageService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model));
         }
         else
         {
-            builder.Services.AddKeyedSingleton<ITextToImageService>(serviceId, (serviceProvider, _) =>
-                new TogetherTextToImageService(
-                    new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint),
-                    model));
+            builder.Services.AddKeyedSingleton<ITextToImageService>(serviceId,
+                (serviceProvider, _) =>
+                    new TogetherTextToImageService(new TogetherClient(apiKey, GetHttpClient(httpClient, serviceProvider), endpoint), model));
         }
-        
+
         return builder;
     }
 

@@ -10,8 +10,8 @@ public static class ChatMessageExtensions
     {
         return new ChatCompletionMessage
         {
-            Role =  message.Role,
-            Content = message.Text,
+            Role = message.Role,
+            Content = message.Text
         };
     }
 
@@ -23,14 +23,12 @@ public static class ChatMessageExtensions
         };
     }
 
-    public static ChatCompletionRequest CreateChatCompletionRequest(
-        this IEnumerable<ChatMessage> messages,
-        string model,
-        bool stream = false)
+    public static ChatCompletionRequest CreateChatCompletionRequest(this IEnumerable<ChatMessage> messages, string model, bool stream = false)
     {
         return new ChatCompletionRequest
         {
-            Messages = messages.Select(m => m.ToChatCompletionMessage()).ToList(),
+            Messages = messages.Select(m => m.ToChatCompletionMessage())
+                .ToList(),
             Model = model,
             Stream = stream
         };
@@ -40,11 +38,9 @@ public static class ChatMessageExtensions
     {
         if (message.TryGetProperty("role", out var roleElement))
         {
-            return roleElement.ValueKind == JsonValueKind.String 
-                ? roleElement.GetString() ?? string.Empty 
-                : string.Empty;
+            return roleElement.ValueKind == JsonValueKind.String ? roleElement.GetString() ?? string.Empty : string.Empty;
         }
-        
+
         return string.Empty;
     }
 
@@ -52,11 +48,9 @@ public static class ChatMessageExtensions
     {
         if (message.TryGetProperty("content", out var contentElement))
         {
-            return contentElement.ValueKind == JsonValueKind.String 
-                ? contentElement.GetString() ?? string.Empty 
-                : string.Empty;
+            return contentElement.ValueKind == JsonValueKind.String ? contentElement.GetString() ?? string.Empty : string.Empty;
         }
-        
+
         return string.Empty;
     }
 }
