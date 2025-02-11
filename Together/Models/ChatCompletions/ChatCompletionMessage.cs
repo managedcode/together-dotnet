@@ -12,5 +12,5 @@ public class ChatCompletionMessage
     public string? Content { get; set; }
 
     [JsonPropertyName("tool_calls")]
-    public List<ToolCalls> ToolCalls { get; set; } = new();
+    public List<ToolCall> ToolCalls { get; set; } = new();
 }

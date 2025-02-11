@@ -1,7 +1,7 @@
 using Microsoft.Extensions.AI;
 using Together.Models.ChatCompletions;
 
-namespace Together.Extensions;
+namespace Together.SemanticKernel;
 
 public static class ChatOptionsConverter
 {

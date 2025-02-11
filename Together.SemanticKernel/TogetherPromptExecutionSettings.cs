@@ -2,9 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.SemanticKernel;
 
-
-
-namespace Together.Models.ChatCompletions;
+namespace Together.SemanticKernel;
 
 /// <summary>
 /// Together AI Execution Settings.

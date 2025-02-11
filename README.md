@@ -1,112 +1,111 @@
 # Together .NET SDK
 
-C# SDK for Together.ai
+[![.NET](https://github.com/managedcode/Together/actions/workflows/dotnet.yml/badge.svg)](https://github.com/managedcode/Together/actions/workflows/dotnet.yml)
+[![NuGet](https://img.shields.io/nuget/v/ManagedCode.Together.svg)](https://www.nuget.org/packages/ManagedCode.Together)
+[![NuGet](https://img.shields.io/nuget/v/ManagedCode.Together.SemanticKernel.svg)](https://www.nuget.org/packages/ManagedCode.Together.SemanticKernel)
+[![Downloads](https://img.shields.io/nuget/dt/ManagedCode.Together.svg)](https://www.nuget.org/packages/ManagedCode.Together)
+[![License](https://img.shields.io/github/license/managedcode/Together)](https://github.com/managedcode/Together/blob/main/LICENSE)
+
+Unofficial C# SDK for [Together.ai](https://www.together.ai/) with Semantic Kernel integration.
 
 ## Introduction
 
-The Together .NET SDK provides a simple and efficient way to interact with the Together.ai API using C#. This SDK allows
-you to easily integrate various AI capabilities such as completions, chat completions, embeddings, and image generations
-into your .NET applications.
+Together.ai provides access to the latest open-source AI models through a simple API. This SDK offers:
 
-## Features
-
-- **Completions**: Generate text completions based on a given prompt.
-- **Chat Completions**: Generate chat-based completions for conversational AI.
-- **Embeddings**: Generate vector embeddings for text.
-- **Images**: Generate images based on a given prompt.
+- 🚀 Easy access to Together.ai's API from .NET applications
+- 🧠 Seamless integration with Microsoft Semantic Kernel
+- 🔧 Chat Completions, Text Generation, Embeddings and Image Generation
+- 🌊 Both synchronous and streaming responses
+- 🛠 Built-in function calling support
 
 ## Installation
 
-To install the Together .NET SDK, add the following package to your project:
+Choose the package(s) you need:
 
 ```sh
-dotnet add package Together
+# Core API client
+dotnet add package ManagedCode.Together
+
+# Semantic Kernel integration
+dotnet add package ManagedCode.Together.SemanticKernel
 ```
 
-## Usage
+## Usage Examples
 
-### Initialization
-
-To use the SDK, you need to initialize the `TogetherClient` with an `HttpClient`:
+### Direct API Usage
 
 ```csharp
 using Together;
-using System.Net.Http.Headers;
 
-var httpClient = new HttpClient { BaseAddress = new Uri(TogetherConstants.BASE_URL) };
-httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "YOUR_API_KEY");
-var client = new TogetherClient(httpClient);
+var client = new TogetherClient("YOUR_API_KEY");
+var response = await client.ChatCompletions.CreateAsync(new ChatCompletionRequest 
+{
+    Model = "mistralai/Mistral-7B-Instruct-v0.1",
+    Messages = new[] 
+    { 
+        new ChatCompletionMessage { Role = "user", Content = "Hello!" } 
+    }
+});
 ```
 
-### Completions
-
-To get a text completion:
+### Semantic Kernel Integration
 
 ```csharp
-var request = new CompletionRequest
-{
-    Prompt = "Hello, world!",
-    Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
-};
-var response = await client.GetCompletionResponseAsync(request);
-Console.WriteLine(response.Choices.First().Text);
+using Microsoft.SemanticKernel;
+using Together.SemanticKernel;
+
+// Initialize kernel with multiple Together.ai capabilities
+var kernel = Kernel.CreateBuilder()
+    .AddTogetherChatCompletion(
+        "mistralai/Mistral-7B-Instruct-v0.1", 
+        "YOUR_API_KEY"
+    )
+    .AddTogetherTextEmbeddingGeneration(
+        "togethercomputer/m2-bert-80M-2k-retrieval",
+        "YOUR_API_KEY"
+    )
+    .AddTogetherTextToImage(
+        "stabilityai/stable-diffusion-xl-base-1.0",
+        "YOUR_API_KEY"
+    )
+    .Build();
+
+// Chat completion
+var chatResult = await kernel.InvokePromptAsync("What is quantum computing?");
+
+// Generate embeddings
+var embeddingService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+var embeddings = await embeddingService.GenerateEmbeddingsAsync(
+    ["What is quantum computing?"]
+);
+
+// Generate images
+var imageService = kernel.GetRequiredService<ITextToImageService>();
+var images = await imageService.GetImageContentsAsync(
+    "A cat playing piano",
+    new TogetherTextToImageExecutionSettings 
+    {
+        Height = 512,
+        Width = 512
+    }
+);
 ```
 
-### Chat Completions
+## 📚 Documentation
 
-To get a chat completion:
+For more information about available models and features, visit the [Together.ai Documentation](https://docs.together.ai/)
 
-```csharp
-var request = new ChatCompletionRequest
-{
-    Messages = new List<ChatCompletionMessage> { new ChatCompletionMessage { Role = "user", Content = "Hello!" } },
-    Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo"
-};
-var response = await client.GetChatCompletionResponseAsync(request);
-Console.WriteLine(response.Choices.First().Message.Content);
-```
+## 💪 Contributing
 
-### Embeddings
+Contributions are welcome! Feel free to:
+- Open issues for bugs or feature requests
+- Submit pull requests
+- Improve documentation
 
-To get embeddings:
-
-```csharp
-var request = new EmbeddingRequest
-{
-    Input = "Hello, world!",
-    Model = "togethercomputer/m2-bert-80M-2k-retrieval"
-};
-var response = await client.GetEmbeddingResponseAsync(request);
-Console.WriteLine(string.Join(", ", response.Data.First().Embedding));
-```
-
-### Images
-
-To generate an image:
-
-```csharp
-var request = new ImageRequest
-{
-    Prompt = "A beautiful sunset over the mountains",
-    Model = "black-forest-labs/FLUX.1-dev",
-    N = 1,
-    Steps = 10,
-    Height = 512,
-    Width = 512
-};
-var response = await client.GetImageResponseAsync(request);
-Console.WriteLine(response.Data.First().Url);
-```
-
-## Constants
-
-The SDK provides various constants that can be used throughout your application. These constants are defined in the
-`TogetherConstants` class.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request on GitHub.
-
-## License
+## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## ⭐ Support
+
+If you find this project useful, please give it a star on GitHub!

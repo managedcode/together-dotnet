@@ -1,9 +1,8 @@
-using Microsoft.Extensions.AI;
 using System.Text.Json;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Extensions.AI;
+using Together.Models.ChatCompletions;
 
-namespace Together.Models.ChatCompletions;
+namespace Together.SemanticKernel.Extensions;
 
 public static class ChatMessageExtensions
 {
@@ -36,55 +35,81 @@ public static class ChatMessageExtensions
             Stream = stream
         };
     }
-}
 
-public static class ResponseFormatExtensions
-{
-    public static ResponseFormat ToResponseFormat(this ChatResponseFormat chatResponseFormat)
+    private static string GetRole(JsonElement message)
     {
-        return new ResponseFormat
+        if (message.TryGetProperty("role", out var roleElement))
         {
-            Type = chatResponseFormat is ChatResponseFormatText ? ResponseFormatType.JsonObject : ResponseFormatType.JsonSchema,
-            Schema = chatResponseFormat is ChatResponseFormatJson jsonFormat 
-                ? JsonSerializer.Deserialize<Dictionary<string, object>>(jsonFormat.Schema ?? "{}") 
-                : new Dictionary<string, object>()
-        };
-    }
-
-    public static ChatResponseFormat ToChatResponseFormat(this ResponseFormat responseFormat)
-    {
-        return responseFormat.Type == ResponseFormatType.JsonObject
-            ? ChatResponseFormat.Text
-            : ChatResponseFormat.ForJsonSchema(JsonSerializer.Serialize(responseFormat.Schema));
-    }
-    
-    public static StreamingChatMessageContent ToStreamingChatMessageContent(this ChatCompletionChunk chunk)
-    {
-        var content = chunk.Choices.FirstOrDefault()?.Delta?.Content;
-        return content != null ? new StreamingChatMessageContent(AuthorRole.Assistant, content) : null;
-    }
-}
-
-public static class MessagesExtensions
-{
-    public static ChatCompletionMessage ToChatCompletionMessage(this ChatMessageContent messageContent)
-    {
-        ArgumentNullException.ThrowIfNull(messageContent);
-
-        return new ChatCompletionMessage
-        {
-            Role = new ChatRole(messageContent.Role.ToString()),
-            Content = messageContent.Content,
-        };
-    }
-    
-    public static IEnumerable<ChatCompletionMessage> ToChatCompletionMessages(this ChatHistory history)
-    {
-        ArgumentNullException.ThrowIfNull(history);
-
-        foreach (var item in history)
-        {
-            yield return item.ToChatCompletionMessage();
+            return roleElement.ValueKind == JsonValueKind.String 
+                ? roleElement.GetString() ?? string.Empty 
+                : string.Empty;
         }
+        
+        return string.Empty;
+    }
+
+    private static string GetContent(JsonElement message)
+    {
+        if (message.TryGetProperty("content", out var contentElement))
+        {
+            return contentElement.ValueKind == JsonValueKind.String 
+                ? contentElement.GetString() ?? string.Empty 
+                : string.Empty;
+        }
+        
+        return string.Empty;
     }
 }
+
+// public static class ResponseFormatExtensions
+// {
+//     public static ResponseFormat ToResponseFormat(this ChatResponseFormat chatResponseFormat)
+//     {
+//         if (chatResponseFormat == null)
+//         {
+//             return new ResponseFormat { Type = ResponseFormatType.JsonObject };
+//         }
+//
+//         var responseFormat = new ResponseFormat();
+//
+//         if (chatResponseFormat is ChatResponseFormatJson jsonFormat)
+//         {
+//             responseFormat.Type = ResponseFormatType.JsonObject;
+//             if (jsonFormat.Schema is not null)
+//             {
+//                 try
+//                 {
+//                     responseFormat.Schema = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonFormat.Schema);
+//                 }
+//                 catch
+//                 {
+//                     responseFormat.Schema = new Dictionary<string, object>();
+//                 }
+//             }
+//             else
+//             {
+//                 responseFormat.Schema = new Dictionary<string, object>();
+//             }
+//         }
+//         else // ChatResponseFormatText
+//         {
+//             responseFormat.Type = ResponseFormatType.JsonSchema;
+//         }
+//
+//         return responseFormat;
+//     }
+//
+//     public static ChatResponseFormat ToChatResponseFormat(this ResponseFormat responseFormat)
+//     {
+//         if (responseFormat == null || responseFormat.Type == ResponseFormatType.JsonObject)
+//         {
+//             return ChatResponseFormat.Text;
+//         }
+//
+//         var schema = responseFormat.Schema != null 
+//             ? JsonSerializer.Serialize(responseFormat.Schema)
+//             : "{}";
+//
+//         return ChatResponseFormat.ForJsonSchema(schema);
+//     }
+// }

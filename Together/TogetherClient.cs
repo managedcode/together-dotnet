@@ -14,8 +14,18 @@ public class TogetherClient
     {
     }
 
-    public TogetherClient(string apiKey, HttpClient httpClient,  string baseUrl = BaseUrl)
+    public TogetherClient(string apiKey, HttpClient httpClient, string? baseUrl = null)
     {
+        if(string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw new ArgumentException("API key is required", nameof(apiKey));
+        }
+        
+        if(string.IsNullOrWhiteSpace(baseUrl))
+        {
+            baseUrl = BaseUrl;
+        }
+        
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(baseUrl);
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
