@@ -1,17 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.TextToImage;
 using Shouldly;
-using Together.Models.ChatCompletions;
-using Together.Models.Completions;
-using Together.Models.Embeddings;
-using Together.Models.Images;
-using Together.Models.Rerank;
 using Together.SemanticKernel;
 using Together.SemanticKernel.Extensions;
 using TextContent = Microsoft.SemanticKernel.TextContent;
@@ -51,18 +44,18 @@ public class SemanticKernelIntegraionTests
             .AddOpenAIChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", new Uri("https://api.together.xyz/v1"), API_KEY)
             .Build();
 
-        bool call = false;
+        var call = false;
 
         kernel.Plugins.AddFromFunctions("time_plugin", [
-            KernelFunctionFactory.CreateFromMethod(method: () =>
+            KernelFunctionFactory.CreateFromMethod(() =>
             {
                 call = true;
                 return DateTime.Now;
-            }, functionName: "get_time", description: "Get the current time")
+            }, "get_time", "Get the current time")
         ]);
 
         var message = await kernel.GetRequiredService<IChatCompletionService>()
-            .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings()
+            .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings
             {
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             }, kernel);
@@ -98,18 +91,18 @@ public class SemanticKernelIntegraionTests
             .AddTogetherChatCompletion("mistralai/Mistral-7B-Instruct-v0.1", API_KEY)
             .Build();
 
-        bool call = false;
+        var call = false;
 
         kernel.Plugins.AddFromFunctions("time_plugin", [
-            KernelFunctionFactory.CreateFromMethod(method: () =>
+            KernelFunctionFactory.CreateFromMethod(() =>
             {
                 call = true;
                 return DateTime.Now;
-            }, functionName: "get_time", description: "Get the current time")
+            }, "get_time", "Get the current time")
         ]);
 
         var message = await kernel.GetRequiredService<IChatCompletionService>()
-            .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings()
+            .GetChatMessageContentAsync("What is the current time?", new OpenAIPromptExecutionSettings
             {
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             }, kernel);
@@ -134,10 +127,10 @@ public class SemanticKernelIntegraionTests
 
         var imageService = kernel.GetRequiredService<ITextToImageService>();
 
-        var images = await imageService.GetImageContentsAsync(new TextContent()
+        var images = await imageService.GetImageContentsAsync(new TextContent
         {
             Text = "Cats eating popcorn"
-        }, new TogetherTextToImageExecutionSettings()
+        }, new TogetherTextToImageExecutionSettings
         {
             Height = 512,
             Width = 512
@@ -165,7 +158,7 @@ public class SemanticKernelIntegraionTests
 
         var embedding = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
 
-        var embeddings = await embedding.GenerateEmbeddingsAsync(new List<string>()
+        var embeddings = await embedding.GenerateEmbeddingsAsync(new List<string>
         {
             "Cats eating popcorn"
         });

@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using Together.Models.ChatCompletions;
 using Together.Models.Completions;
 using Together.Models.Embeddings;

@@ -93,11 +93,13 @@ var images = await imageService.GetImageContentsAsync(
 
 ## 📚 Documentation
 
-For more information about available models and features, visit the [Together.ai Documentation](https://docs.together.ai/)
+For more information about available models and features, visit
+the [Together.ai Documentation](https://docs.together.ai/)
 
 ## 💪 Contributing
 
 Contributions are welcome! Feel free to:
+
 - Open issues for bugs or feature requests
 - Submit pull requests
 - Improve documentation
