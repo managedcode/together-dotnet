@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.SemanticKernel;
+using Together.Models.Images;
 
 namespace Together.SemanticKernel;
 
@@ -10,9 +11,12 @@ public sealed class TogetherTextToImageExecutionSettings : PromptExecutionSettin
     private int? _n = 1;
     private string? _negativePrompt;
     private ulong? _seed;
-
     private int? _steps = 20;
     private int? _width = 1024;
+    private string? _prompt;
+    private string? _imageUrl;
+    private List<ImageLora>? _imageLoras;
+    private string _responseFormat = "url";
 
     [JsonPropertyName("steps")]
     public int? Steps
@@ -68,6 +72,18 @@ public sealed class TogetherTextToImageExecutionSettings : PromptExecutionSettin
             _width = value;
         }
     }
+    
+    
+    [JsonPropertyName("prompt")]
+    public string? Prompt
+    {
+        get => _prompt;
+        set
+        {
+            ThrowIfFrozen();
+            _prompt = value;
+        }
+    }
 
     [JsonPropertyName("negative_prompt")]
     public string? NegativePrompt
@@ -80,17 +96,55 @@ public sealed class TogetherTextToImageExecutionSettings : PromptExecutionSettin
         }
     }
 
+    
+    [JsonPropertyName("image_url")]
+    public string? ImageUrl
+    {
+        get => _imageUrl;
+        set
+        {
+            ThrowIfFrozen();
+            _imageUrl = value;
+        }
+    }
+
+    [JsonPropertyName("image_loras")]
+    public List<ImageLora>? ImageLoras
+    {
+        get => _imageLoras;
+        set
+        {
+            ThrowIfFrozen();
+            _imageLoras = value;
+        }
+    }
+
+    [JsonPropertyName("response_format")]
+    public string ResponseFormat
+    {
+        get => _responseFormat;
+        set
+        {
+            ThrowIfFrozen();
+            _responseFormat = value;
+        }
+    }
+
     public override PromptExecutionSettings Clone()
     {
         return new TogetherTextToImageExecutionSettings
         {
             ModelId = ModelId,
+            Prompt = Prompt,
             Steps = Steps,
             Seed = Seed,
             N = N,
             Height = Height,
             Width = Width,
             NegativePrompt = NegativePrompt,
+            ImageUrl = ImageUrl,
+            ImageLoras = ImageLoras?.ToList(),
+            ResponseFormat = ResponseFormat,
             ExtensionData = ExtensionData != null ? new Dictionary<string, object>(ExtensionData) : null
         };
     }

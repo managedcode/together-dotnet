@@ -26,5 +26,16 @@ public class ImageRequest
     public int? Width { get; set; } = 1024;
 
     [JsonPropertyName("negative_prompt")]
-    public string NegativePrompt { get; set; }
+    public string? NegativePrompt { get; set; }
+    
+    [JsonPropertyName("image_url")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ImageUrl { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("image_loras")]
+    public List<ImageLora>? ImageLoras { get; set; }
+
+    [JsonPropertyName("response_format")]
+    public string ResponseFormat { get; set; } = "url";
 }

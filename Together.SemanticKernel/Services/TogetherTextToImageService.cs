@@ -93,51 +93,111 @@ public class TogetherTextToImageService : ITextToImageService
         }
     }
 
-    private static void ApplyTogetherSettings(ImageRequest request, TogetherTextToImageExecutionSettings settings)
+private static void ApplyTogetherSettings(ImageRequest request, TogetherTextToImageExecutionSettings settings)
+{
+    if (settings.Width.HasValue)
     {
-        if (settings.Width.HasValue)
-        {
-            request.Width = settings.Width.Value;
-        }
-
-        if (settings.Height.HasValue)
-        {
-            request.Height = settings.Height.Value;
-        }
-
-        if (!string.IsNullOrEmpty(settings.NegativePrompt))
-        {
-            request.NegativePrompt = settings.NegativePrompt;
-        }
-
-        if (settings.Seed.HasValue)
-        {
-            request.Seed = settings.Seed.Value;
-        }
+        request.Width = settings.Width.Value;
     }
 
-    private static void ApplyExecutionSettings(ImageRequest request, IDictionary<string, object> settings)
+    if (settings.Height.HasValue)
     {
-        if (settings.TryGetValue("width", out var width) && width is int widthValue)
-        {
-            request.Width = widthValue;
-        }
-
-        if (settings.TryGetValue("height", out var height) && height is int heightValue)
-        {
-            request.Height = heightValue;
-        }
-
-        if (settings.TryGetValue("negative_prompt", out var negativePrompt) && negativePrompt is string negativePromptValue)
-        {
-            request.NegativePrompt = negativePromptValue;
-        }
-
-        if (settings.TryGetValue("seed", out var seed) && seed is ulong seedValue)
-        {
-            request.Seed = seedValue;
-        }
+        request.Height = settings.Height.Value;
     }
+
+    if (!string.IsNullOrEmpty(settings.NegativePrompt))
+    {
+        request.NegativePrompt = settings.NegativePrompt;
+    }
+
+    if (settings.Seed.HasValue)
+    {
+        request.Seed = settings.Seed.Value;
+    }
+
+    if (!string.IsNullOrEmpty(settings.Prompt))
+    {
+        request.Prompt = settings.Prompt;
+    }
+
+    if (settings.Steps.HasValue)
+    {
+        request.Steps = settings.Steps.Value;
+    }
+
+    if (settings.N.HasValue)
+    {
+        request.N = settings.N.Value;
+    }
+
+    if (!string.IsNullOrEmpty(settings.ImageUrl))
+    {
+        request.ImageUrl = settings.ImageUrl;
+    }
+
+    if (settings.ImageLoras != null)
+    {
+        request.ImageLoras = settings.ImageLoras;
+    }
+
+    if (!string.IsNullOrEmpty(settings.ResponseFormat))
+    {
+        request.ResponseFormat = settings.ResponseFormat;
+    }
+}
+
+private static void ApplyExecutionSettings(ImageRequest request, IDictionary<string, object> settings)
+{
+    if (settings.TryGetValue("width", out var width) && width is int widthValue)
+    {
+        request.Width = widthValue;
+    }
+
+    if (settings.TryGetValue("height", out var height) && height is int heightValue)
+    {
+        request.Height = heightValue;
+    }
+
+    if (settings.TryGetValue("negative_prompt", out var negativePrompt) && negativePrompt is string negativePromptValue)
+    {
+        request.NegativePrompt = negativePromptValue;
+    }
+
+    if (settings.TryGetValue("seed", out var seed) && seed is ulong seedValue)
+    {
+        request.Seed = seedValue;
+    }
+
+    if (settings.TryGetValue("prompt", out var prompt) && prompt is string promptValue)
+    {
+        request.Prompt = promptValue;
+    }
+
+    if (settings.TryGetValue("steps", out var steps) && steps is int stepsValue)
+    {
+        request.Steps = stepsValue;
+    }
+
+    if (settings.TryGetValue("n", out var n) && n is int nValue)
+    {
+        request.N = nValue;
+    }
+
+    if (settings.TryGetValue("image_url", out var imageUrl) && imageUrl is string imageUrlValue)
+    {
+        request.ImageUrl = imageUrlValue;
+    }
+
+    if (settings.TryGetValue("image_loras", out var loras) && loras is List<ImageLora> lorasValue)
+    {
+        request.ImageLoras = lorasValue;
+    }
+
+    if (settings.TryGetValue("response_format", out var format) && format is string formatValue)
+    {
+        request.ResponseFormat = formatValue;
+    }
+}
 
     private static void ValidateImageRequest(ImageRequest request)
     {

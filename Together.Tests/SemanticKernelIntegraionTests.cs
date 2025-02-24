@@ -17,7 +17,7 @@ public class SemanticKernelIntegraionTests
 
 
     private string TextModel = "mistralai/Mistral-7B-Instruct-v0.1";//"meta-llama/Llama-3.3-70B-Instruct-Turbo";
-    private string ImageModel = "black-forest-labs/FLUX.1-dev";
+    private string ImageModel = "black-forest-labs/FLUX.1-depth";
     private string EmbeddedModel = "togethercomputer/m2-bert-80M-2k-retrieval";
 
     [Fact
@@ -190,6 +190,38 @@ public class SemanticKernelIntegraionTests
         {
             Height = 512,
             Width = 512
+        });
+
+
+        images.Count.ShouldBePositive();
+        images.First()
+            .Uri
+            .ShouldNotBeNull();
+    }
+    
+    [Fact
+#if !API_TEST
+            (Skip = "This test is skipped because it requires a valid API key")
+#endif
+    ]
+    [Experimental("SKEXP0001")]
+    public async Task ImageTestLora()
+    {
+        var kernel = Kernel.CreateBuilder()
+            .AddTogetherTextToImage(ImageModel, API_KEY)
+            .Build();
+
+
+        var imageService = kernel.GetRequiredService<ITextToImageService>();
+
+        var images = await imageService.GetImageContentsAsync(new TextContent
+        {
+            Text = "Make a cat base on photo eating popcorn"
+        }, new TogetherTextToImageExecutionSettings
+        {
+            Height = 512,
+            Width = 512,
+            ImageUrl = "https://avatars.githubusercontent.com/u/1024025?v=4"
         });
 
 
