@@ -11,6 +11,10 @@ public class TogetherClientIntegraionTests
 {
     private static readonly string API_KEY = "API_KEY";
 
+    private string TextModel = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
+    private string ImageModel = "black-forest-labs/FLUX.1-dev";
+    private string EmbeddedModel = "togethercomputer/m2-bert-80M-2k-retrieval";
+    
     private TogetherClient CreateTogetherClient()
     {
         return new TogetherClient(API_KEY);
@@ -29,7 +33,7 @@ public class TogetherClientIntegraionTests
         var responseAsync = await client.Completions.CreateAsync(new CompletionRequest
         {
             Prompt = "Hi",
-            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
+            Model = TextModel,
             MaxTokens = 20
         });
 
@@ -56,7 +60,7 @@ public class TogetherClientIntegraionTests
                     Content = "Hi"
                 }
             },
-            Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
+            Model = TextModel,
             MaxTokens = 20
         });
 
@@ -84,7 +88,7 @@ public class TogetherClientIntegraionTests
                         Content = "Hi"
                     }
                 },
-                Model = "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
+                Model = TextModel,
                 MaxTokens = 20,
                 Stream = true
             })
@@ -107,7 +111,7 @@ public class TogetherClientIntegraionTests
         var responseAsync = await client.Embeddings.CreateAsync(new EmbeddingRequest
         {
             Input = "Hi",
-            Model = "togethercomputer/m2-bert-80M-2k-retrieval"
+            Model = EmbeddedModel
         });
 
         Assert.NotNull(responseAsync.Data);
@@ -124,7 +128,7 @@ public class TogetherClientIntegraionTests
 
         var responseAsync = await client.Images.GenerateAsync(new ImageRequest
         {
-            Model = "black-forest-labs/FLUX.1-dev",
+            Model = ImageModel,
             Prompt = "Cats eating popcorn",
             N = 1,
             Steps = 10,

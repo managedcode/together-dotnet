@@ -11,10 +11,14 @@ public abstract class BaseClient
     {
         HttpClient = httpClient;
     }
-
+    
     protected async Task<TResponse> SendRequestAsync<TRequest, TResponse>(string requestUri, TRequest request, CancellationToken cancellationToken)
     {
         var responseMessage = await HttpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+        
+        #if DEBUG
+        var message = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+        #endif
 
         if (responseMessage.IsSuccessStatusCode)
         {
@@ -67,6 +71,10 @@ public abstract class BaseClient
             {
                 return response;
             }
+#if  DEBUG
+          
+            var message = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+#endif
 
             var result = await responseMessage.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
             return result!;

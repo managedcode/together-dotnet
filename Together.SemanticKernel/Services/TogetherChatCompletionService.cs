@@ -60,7 +60,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                     Stream = false
                 };
 
-                var toolConfig = GetToolConfiguration(kernel, executionSettings, requestIndex);
+                var toolConfig = GetToolConfiguration(kernel, chatHistory, executionSettings, requestIndex);
                 if (toolConfig.HasTools)
                 {
                     ConfigureTools(kernel, request);
@@ -81,13 +81,13 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                 }
 
                 var result = response.Choices.First();
-                var messageContent = CreateChatMessageContent(new ChatCompletionMessage
+                var message = new ChatCompletionMessage
                 {
                     Role = result.Message.Role,
                     Content = result.Message.Content,
                     ToolCalls = result.Message
                         .ToolCalls
-                        .Select(t => new ToolCall
+                        ?.Select(t => new ToolCall
                         {
                             Id = t.Id,
                             Type = t.Type,
@@ -98,27 +98,34 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
                             }
                         })
                         .ToList()
-                });
-
+                };
+                
+                var messageContent = CreateChatMessageContent(message);
+                
                 // If no tool calls or no auto-invoke, return response
                 if (!toolConfig.AutoInvoke || result.Message.ToolCalls?.Any() != true)
                 {
-                    return new[] { messageContent };
+                    return [messageContent];
                 }
+                
+                //add history
+                chatHistory.Add(messageContent);
 
                 // Process tool calls asynchronously
                 foreach (var toolCall in result.Message.ToolCalls)
                 {
-                    if (!await ProcessToolCallAsync(new ToolCall
+                    var process = await ProcessToolCallAsync(new ToolCall
+                    {
+                        Id = toolCall.Id,
+                        Type = toolCall.Type,
+                        Function = new FunctionCall
                         {
-                            Id = toolCall.Id,
-                            Type = toolCall.Type,
-                            Function = new FunctionCall
-                            {
-                                Name = toolCall.Function.Name,
-                                Arguments = toolCall.Function.Arguments
-                            }
-                        }, kernel, chatHistory, cancellationToken))
+                            Name = toolCall.Function.Name,
+                            Arguments = toolCall.Function.Arguments
+                        }
+                    }, kernel, chatHistory, cancellationToken);
+                    
+                    if (!process)
                     {
                         _logger.LogWarning("Failed to process tool call: {ToolCall}", toolCall.Function?.Name);
                     }
@@ -221,7 +228,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             // Await asynchronous function invocation instead of using .Result
             var result = await function.InvokeAsync(kernel, args, cancellationToken);
 
-            chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, result.GetValue<string>(),
+            chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, result.ToString(),
                 metadata: new Dictionary<string, object?> { { "tool_call_id", toolCall.Id } }));
 
             return true;
@@ -247,7 +254,7 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
         }
     }
 
-    private ToolConfiguration GetToolConfiguration(Kernel? kernel, PromptExecutionSettings? settings, int requestIndex)
+    private ToolConfiguration GetToolConfiguration(Kernel? kernel, ChatHistory chatHistory, PromptExecutionSettings? settings, int requestIndex)
     {
         if (kernel == null)
         {
@@ -262,6 +269,17 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
         {
             return new ToolConfiguration(false, false, 0);
         }
+        
+        if(settings is TogetherPromptExecutionSettings togetherSettings)
+        {
+            var call = togetherSettings.FunctionChoiceBehavior?.GetConfiguration(new FunctionChoiceBehaviorConfigurationContext(chatHistory)
+            {
+                Kernel = kernel
+            });
+            return new ToolConfiguration(hasTools, call?.AutoInvoke ?? false, 1);
+        }
+        
+        //TODO: check type of settings
 
         // Check execution settings
         var autoInvoke = false;
@@ -353,10 +371,11 @@ public sealed class TogetherChatCompletionService : IChatCompletionService, ITex
             })
             .ToList();
 
+        
         request.ToolChoice = new ToolChoice
         {
             Type = "auto",
-            Function = new FunctionToolChoice { Name = "auto" }
+            Function = new FunctionToolChoice { Name = "auto" },
         };
     }
 

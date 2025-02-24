@@ -12,5 +12,6 @@ public class ChatCompletionMessage
     public string? Content { get; set; }
 
     [JsonPropertyName("tool_calls")]
-    public List<ToolCall> ToolCalls { get; set; } = new();
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<ToolCall>? ToolCalls { get; set; }
 }
