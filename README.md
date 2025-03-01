@@ -4,7 +4,7 @@
 [![NuGet](https://img.shields.io/nuget/v/ManagedCode.Together.svg)](https://www.nuget.org/packages/ManagedCode.Together)
 [![NuGet](https://img.shields.io/nuget/v/ManagedCode.Together.SemanticKernel.svg)](https://www.nuget.org/packages/ManagedCode.Together.SemanticKernel)
 [![Downloads](https://img.shields.io/nuget/dt/ManagedCode.Together.svg)](https://www.nuget.org/packages/ManagedCode.Together)
-[![License](https://img.shields.io/github/license/managedcode/Together)](https://github.com/managedcode/Together/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/managedcode/Together)](https://github.com/managedcode/together-dotnet/blob/main/LICENSE)
 
 Unofficial C# SDK for [Together.ai](https://www.together.ai/) with Semantic Kernel integration.
 
