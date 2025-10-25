@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Together.SemanticKernel/Together.SemanticKernel.csproj" />
+  <Project Path="Together.Tests/Together.Tests.csproj" />
+  <Project Path="Together/Together.csproj" />
+</Solution>

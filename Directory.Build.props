@@ -5,6 +5,7 @@
         <LangVersion>13</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <Nullable>enable</Nullable>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
     <!--NuGet-->

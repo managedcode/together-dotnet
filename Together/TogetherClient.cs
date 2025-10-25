@@ -35,9 +35,17 @@ public class TogetherClient
         Embeddings = new EmbeddingClient(_httpClient);
         Files = new FileClient(_httpClient);
         FineTune = new FineTuneClient(_httpClient);
+        Batches = new BatchClient(_httpClient);
+        Endpoints = new EndpointClient(_httpClient);
+        Hardware = new HardwareClient(_httpClient);
+        Evaluation = new EvaluationClient(_httpClient);
+        CodeInterpreter = new CodeInterpreterClient(_httpClient);
+        Audio = new AudioClient(_httpClient);
         Images = new ImageClient(_httpClient);
         Models = new ModelClient(_httpClient);
         Rerank = new RerankClient(_httpClient);
+        Jobs = new JobClient(_httpClient);
+        Videos = new VideoClient(_httpClient);
     }
 
     public CompletionClient Completions { get; }
@@ -45,7 +53,15 @@ public class TogetherClient
     public EmbeddingClient Embeddings { get; }
     public FileClient Files { get; }
     public FineTuneClient FineTune { get; }
+    public BatchClient Batches { get; }
+    public EndpointClient Endpoints { get; }
+    public HardwareClient Hardware { get; }
+    public EvaluationClient Evaluation { get; }
+    public CodeInterpreterClient CodeInterpreter { get; }
+    public AudioClient Audio { get; }
     public ImageClient Images { get; }
     public ModelClient Models { get; }
     public RerankClient Rerank { get; }
+    public JobClient Jobs { get; }
+    public VideoClient Videos { get; }
 }

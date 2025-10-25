@@ -2,7 +2,9 @@ name: nuget
 
 on:
   push:
-    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   nuget-pack:
@@ -18,16 +20,16 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Together.slnx
 
       - name: Build
-        run: dotnet build --configuration Release 
+        run: dotnet build Together.slnx --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release 
+        run: dotnet test Together.slnx --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack --configuration Release -p:IncludeSymbols=false -p:SymbolPackageFormat=snupkg -o "packages"
+        run: dotnet pack Together.slnx --configuration Release --no-build -p:IncludeSymbols=false -p:SymbolPackageFormat=snupkg -o "packages"
 
       - name: Push
         run: dotnet nuget push "packages/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
