@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Together.Models.ChatCompletions;
@@ -11,5 +12,5 @@ public class FunctionTool
     public string Name { get; set; }
 
     [JsonPropertyName("parameters")]
-    public Dictionary<string, object> Parameters { get; set; }
+    public Dictionary<string, object?> Parameters { get; set; }
 }

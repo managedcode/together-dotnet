@@ -67,6 +67,9 @@ public class ChatCompletionRequest
     [JsonPropertyName("tool_choice")]
     public object ToolChoice { get; set; }
 
+    [JsonExtensionData]
+    public Dictionary<string, object?>? AdditionalParameters { get; set; }
+
     public void VerifyParameters()
     {
         if (RepetitionPenalty.HasValue && (PresencePenalty.HasValue || FrequencyPenalty.HasValue))

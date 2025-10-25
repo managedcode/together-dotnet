@@ -1,65 +1,43 @@
-name: .NET
+name: .NET CI
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  
-  
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
+    - name: Checkout
+      uses: actions/checkout@v5
 
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 9.0.x
-      
-        # run build and test           
-      - name: Restore dependencies
-        run: dotnet restore
-      
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-      
-      - name: Test and Collect Code Coverage
-        run: dotnet test --configuration Release  -p:CollectCoverage=true -p:CoverletOutput=coverage/
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
 
-      - name: Copy coverage files 
-        run: |
-          mkdir '${{ github.workspace }}/coverage'
-          find . -name "*.opencover.xml" -exec sh -c 'cp "$0" "coverage/coverage-$(basename $0)"' {} \;
+    - name: Restore dependencies
+      run: dotnet restore Together.slnx
 
-      - name: List coverage files
-        run: ls '${{ github.workspace }}/coverage/'
+    - name: Build
+      run: dotnet build Together.slnx --configuration Release --no-restore
 
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.organization=managedcode
-            -Dsonar.projectKey=managedcode_Together
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.cs.opencover.reportsPaths=${{ github.workspace }}/coverage/
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Test and collect coverage
+      run: dotnet test Together.slnx --configuration Release --no-build -p:CollectCoverage=true -p:CoverletOutput=coverage/
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          
-#      - name: coveralls
-#        uses: coverallsapp/github-action@master
-#        with:
-#          github-token: ${{secrets.GITHUB_TOKEN }}
-#          path-to-lcov: coverage/coverage.info
+    - name: Copy coverage files
+      run: |
+        mkdir -p "${{ github.workspace }}/coverage"
+        find . -name "*.opencover.xml" -exec sh -c 'cp "$1" "coverage/coverage-$(basename "$1")"' _ {} \;
+
+    - name: List coverage files
+      run: ls "${{ github.workspace }}/coverage/"
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
